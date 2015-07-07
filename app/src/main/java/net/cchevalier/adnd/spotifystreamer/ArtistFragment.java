@@ -1,7 +1,9 @@
 package net.cchevalier.adnd.spotifystreamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,17 +19,21 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.ArtistsPager;
+
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ArtistSearchFragment extends Fragment {
+public class ArtistFragment extends Fragment {
 
     EditText artist;
     ListView listArtist;
     ArrayAdapter<String> mArtistAdapter;
 
-    public ArtistSearchFragment() {
+    public ArtistFragment() {
     }
 
     @Override
@@ -38,17 +44,19 @@ public class ArtistSearchFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // Artist Search
         artist = (EditText) rootView.findViewById(R.id.artist_name);
 
+        // Launching search
         artist.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
 
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    //displayArtistAsToast();
-
-                    searchArtist();
+//                    displayArtistAsToast();
+                    displayDummyListArtist();
+//                    searchForArtist();
                     //handled = true;
                 }
 
@@ -56,6 +64,8 @@ public class ArtistSearchFragment extends Fragment {
             }
         });
 
+
+        // ListArtist Handling
         listArtist = (ListView) rootView.findViewById(R.id.listview_artist);
         List<String> emptyList = new ArrayList<>();
         mArtistAdapter = new ArrayAdapter<String>(
@@ -66,11 +76,20 @@ public class ArtistSearchFragment extends Fragment {
         );
         listArtist.setAdapter(mArtistAdapter);
 
+        // Click handling on item artist
         listArtist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 String selectedArtist = mArtistAdapter.getItem(position);
+
+                // Toast version
                 Toast.makeText(getActivity(), selectedArtist, Toast.LENGTH_LONG).show();
+
+                // Start TracksActivity
+                Intent intent = new Intent(getActivity(), TracksActivity.class).
+                        putExtra(Intent.EXTRA_TEXT, selectedArtist);
+                startActivity(intent);
             }
         });
 
@@ -78,16 +97,13 @@ public class ArtistSearchFragment extends Fragment {
         return rootView;
     }
 
-    private void searchArtist() {
+    private void displayDummyListArtist() {
         String search = artist.getText().toString();
         mArtistAdapter.clear();
-
         int count = 10;
         for (Integer i = 0; i < count; i++) {
             mArtistAdapter.add(search + " " + i.toString());
         }
-
-
     }
 
     private void displayArtistAsToast() {
@@ -95,5 +111,13 @@ public class ArtistSearchFragment extends Fragment {
         Toast.makeText(getActivity(), search, Toast.LENGTH_SHORT).show();
     }
 
+    private void searchForArtist() {
+        String artistName = artist.getText().toString();
+
+        SpotifyApi api = new SpotifyApi();
+        SpotifyService spotify = api.getService();
+        ArtistsPager results = spotify.searchArtists("Beyonce");
+        Log.v("NameSearch", results.toString());
+    }
 
 }
