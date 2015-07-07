@@ -1,6 +1,7 @@
 package net.cchevalier.adnd.spotifystreamer;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,7 +22,10 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Track;
+import kaaes.spotify.webapi.android.models.TracksPager;
 
 
 /**
@@ -56,8 +60,12 @@ public class ArtistFragment extends Fragment {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
 //                    displayArtistAsToast();
                     displayDummyListArtist();
-//                    searchForArtist();
+                    //searchForArtist();
                     //handled = true;
+
+                    SearchSpotifyForArtist task = new SearchSpotifyForArtist();
+                    task.execute();
+
                 }
 
                 return handled;
@@ -114,10 +122,41 @@ public class ArtistFragment extends Fragment {
     private void searchForArtist() {
         String artistName = artist.getText().toString();
 
+/*
         SpotifyApi api = new SpotifyApi();
         SpotifyService spotify = api.getService();
         ArtistsPager results = spotify.searchArtists("Beyonce");
         Log.v("NameSearch", results.toString());
+*/
+    }
+
+    public class SearchSpotifyForArtist extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            SpotifyApi api = new SpotifyApi();
+            SpotifyService service = api.getService();
+
+            // A basic search on artists named "Paul"
+            ArtistsPager resultsArtists = service.searchArtists("Paul");
+            List<Artist> artists = resultsArtists.artists.items;
+
+            for (int i = 0; i < artists.size(); i++) {
+                Artist artist = artists.get(i);
+                Log.i("SAPI", i + " " + artist.name);
+            }
+
+            // Top Ten Tracks for most famous artist named "Paul"
+            TracksPager resultsTracks = service.searchTracks(artists.get(0).name);
+            List<Track> tracks = resultsTracks.tracks.items;
+
+            for (int i = 0; i < 10; i++) {
+                Track track = tracks.get(i);
+                Log.i("SAPI", i + " - " + track.name );
+            }
+
+            return null;
+        }
     }
 
 }
