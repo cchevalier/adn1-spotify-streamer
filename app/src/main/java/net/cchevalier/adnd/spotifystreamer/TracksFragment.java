@@ -54,7 +54,7 @@ public class TracksFragment extends Fragment {
         mTrackAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_track,
-                R.id.list_item_track_textview,
+                R.id.list_item_track_name,
                 tracks
         );
 

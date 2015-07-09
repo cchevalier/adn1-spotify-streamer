@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/imageViewTrack"
+        android:id="@+id/list_item_album_image"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
@@ -15,11 +15,27 @@
         android:src="@android:drawable/ic_dialog_dialer"
         tools:background ="#F09664" />
 
-    <TextView
-        android:id="@+id/list_item_track_textview"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:padding="15dp"
-        tools:text="Top Tracks"></TextView>
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/list_item_track_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            tools:text="Track"></TextView>
+
+        <TextView
+            android:id="@+id/list_item_album_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            tools:text="Album"></TextView>
+
+
+    </LinearLayout>
+
 </LinearLayout>
