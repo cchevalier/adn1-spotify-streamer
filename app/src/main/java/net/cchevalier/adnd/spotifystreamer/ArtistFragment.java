@@ -37,14 +37,14 @@ public class ArtistFragment extends Fragment {
     ListView listArtist;
     ArrayAdapter<String> mArtistAdapter;
 
+
     public ArtistFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        //EditText artist = (EditText) getView().findViewById(R.id.artist_name);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -58,20 +58,16 @@ public class ArtistFragment extends Fragment {
                 boolean handled = false;
 
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-//                    displayArtistAsToast();
-                    displayDummyListArtist();
-                    //searchForArtist();
-                    //handled = true;
 
+                    String search = artist.getText().toString();
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
-                    task.execute();
+                    task.execute(search);
 
+                    //handled = true;
                 }
-
                 return handled;
             }
         });
-
 
         // ListArtist Handling
         listArtist = (ListView) rootView.findViewById(R.id.listview_artist);
@@ -101,62 +97,67 @@ public class ArtistFragment extends Fragment {
             }
         });
 
-
         return rootView;
     }
 
-    private void displayDummyListArtist() {
-        String search = artist.getText().toString();
+
+    private void displayDummyListArtist(String search) {
+
         mArtistAdapter.clear();
+
         int count = 10;
         for (Integer i = 0; i < count; i++) {
             mArtistAdapter.add(search + " " + i.toString());
         }
     }
 
-    private void displayArtistAsToast() {
-        String search = artist.getText().toString();
-        Toast.makeText(getActivity(), search, Toast.LENGTH_SHORT).show();
-    }
 
-    private void searchForArtist() {
-        String artistName = artist.getText().toString();
+    public class SearchSpotifyForArtist extends AsyncTask<String, Void, List<Artist>> {
 
-/*
-        SpotifyApi api = new SpotifyApi();
-        SpotifyService spotify = api.getService();
-        ArtistsPager results = spotify.searchArtists("Beyonce");
-        Log.v("NameSearch", results.toString());
-*/
-    }
-
-    public class SearchSpotifyForArtist extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected List<Artist> doInBackground(String... params) {
+
+            if (params.length == 0) {
+                return null;
+            }
 
             SpotifyApi api = new SpotifyApi();
             SpotifyService service = api.getService();
 
-            // A basic search on artists named "Paul"
-            ArtistsPager resultsArtists = service.searchArtists("Paul");
+            // A basic search on artists named params[0]
+            ArtistsPager resultsArtists = service.searchArtists(params[0]);
             List<Artist> artists = resultsArtists.artists.items;
 
+            // logcat:
             for (int i = 0; i < artists.size(); i++) {
                 Artist artist = artists.get(i);
                 Log.i("SAPI", i + " " + artist.name);
+                Log.i("SAPI", i + "   id: " + artist.id);
+                Log.i("SAPI", i + "  uri: " + artist.uri);
             }
 
-            // Top Ten Tracks for most famous artist named "Paul"
+            // logcat: Top Ten Tracks for most famous artist named on previous search
             TracksPager resultsTracks = service.searchTracks(artists.get(0).name);
             List<Track> tracks = resultsTracks.tracks.items;
-
             for (int i = 0; i < 10; i++) {
                 Track track = tracks.get(i);
                 Log.i("SAPI", i + " - " + track.name );
             }
-
-            return null;
+            return artists;
         }
-    }
 
+        @Override
+        protected void onPostExecute(List<Artist> artists) {
+            //super.onPostExecute(aVoid);
+
+            if (artists != null) {
+                mArtistAdapter.clear();
+                for (int i = 0; i < artists.size(); i++) {
+                    mArtistAdapter.add(artists.get(i).name);
+                }
+            }
+        }
+
+
+    }
 }

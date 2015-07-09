@@ -11,14 +11,15 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:padding="20dp"
-        android:src="@android:drawable/ic_dialog_info" />
+        android:padding="15dp"
+        android:src="@android:drawable/ic_dialog_info"
+        tools:background ="#F09664" />
 
     <TextView
         android:id="@+id/list_item_artist_textview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:padding="20dp"
+        android:padding="15dp"
         tools:text="Artist"></TextView>
 </LinearLayout>
