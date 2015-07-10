@@ -34,10 +34,12 @@ public class TracksFragment extends Fragment {
 
         // Handling of intent
         String artist = "dummy";
+        String artistId = "dummy";
         Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            artist = intent.getStringExtra(Intent.EXTRA_TEXT);
-            ((TextView) rootView.findViewById(R.id.artist_header_view)).setText(artist);
+        if (intent != null && intent.hasExtra("ARTIST_ID")) {
+            artist = intent.getStringExtra("ARTIST_NAME");
+            artistId = intent.getStringExtra("ARTIST_ID");
+            ((TextView) rootView.findViewById(R.id.artist_header_view)).setText(artistId);
         }
 
         // Retrieve listTrack

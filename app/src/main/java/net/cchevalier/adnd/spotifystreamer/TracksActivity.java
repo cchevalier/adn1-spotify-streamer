@@ -20,14 +20,27 @@ public class TracksActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
 
             Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                String artist = intent.getStringExtra(Intent.EXTRA_TEXT);
+            if (intent != null && intent.hasExtra("ARTIST_NAME")) {
+                String artist = intent.getStringExtra("ARTIST_NAME");
                 actionBar.setSubtitle(artist);
             }
 
         }
     }
 
+/*
+* https://discussions.udacity.com/t/back-works-rotation-works-but-up-doesnt/21564/2
+*//*
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        if(!super.onSupportNavigateUp()){
+            finish();
+        }
+        return true;
+    }
+
+*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -45,6 +58,12 @@ public class TracksActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        // http://stackoverflow.com/questions/22182888/actionbar-up-button-destroys-parent-activity-back-does-not
+        if (id == android.R.id.home) {
+            onBackPressed();
             return true;
         }
 

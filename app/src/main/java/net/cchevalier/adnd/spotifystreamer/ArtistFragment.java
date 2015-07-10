@@ -1,5 +1,6 @@
 package net.cchevalier.adnd.spotifystreamer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -47,18 +49,23 @@ public class ArtistFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Artist Search
+        // Retrieves Search View
         searchView = (EditText) rootView.findViewById(R.id.search_view);
 
-        // Launching search
+        // Launching search using setOnEditorActionListener
         searchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
 
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 
                     String search = searchView.getText().toString();
+
+                    InputMethodManager imm = (InputMethodManager)  getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
                     task.execute(search);
 
@@ -85,7 +92,8 @@ public class ArtistFragment extends Fragment {
 
                 // Start TracksActivity
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
-                intent.putExtra(Intent.EXTRA_TEXT, selectedArtist.name);
+                intent.putExtra("ARTIST_NAME", selectedArtist.name);
+                intent.putExtra("ARTIST_ID", selectedArtist.id);
                 startActivity(intent);
             }
         });

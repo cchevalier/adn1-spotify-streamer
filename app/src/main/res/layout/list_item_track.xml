@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:padding="15dp"
-        android:src="@android:drawable/ic_dialog_dialer"
+        android:src="@android:drawable/ic_menu_help"
         tools:background ="#F09664" />
 
     <LinearLayout
