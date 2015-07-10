@@ -37,7 +37,7 @@ public class TracksFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             artist = intent.getStringExtra(Intent.EXTRA_TEXT);
-            ((TextView) rootView.findViewById(R.id.tracks_artist)).setText(artist);
+            ((TextView) rootView.findViewById(R.id.artist_header_view)).setText(artist);
         }
 
         // Retrieve listTrack

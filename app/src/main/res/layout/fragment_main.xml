@@ -15,7 +15,7 @@
         android:layout_height="wrap_content" />
 
     <EditText
-        android:id="@+id/artist_name"
+        android:id="@+id/search_view"
         android:hint="@string/artist_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

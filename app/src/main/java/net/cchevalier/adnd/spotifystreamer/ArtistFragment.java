@@ -32,8 +32,8 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  */
 public class ArtistFragment extends Fragment {
 
-    EditText artist;
-    ListView listArtist;
+    EditText searchView;
+    ListView listArtistView;
     ArtistAdapter mArtistAdapter;
 
 
@@ -48,17 +48,17 @@ public class ArtistFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Artist Search
-        artist = (EditText) rootView.findViewById(R.id.artist_name);
+        searchView = (EditText) rootView.findViewById(R.id.search_view);
 
         // Launching search
-        artist.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        searchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
 
-                if(actionId == EditorInfo.IME_ACTION_DONE){
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
 
-                    String search = artist.getText().toString();
+                    String search = searchView.getText().toString();
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
                     task.execute(search);
 
@@ -69,24 +69,23 @@ public class ArtistFragment extends Fragment {
         });
 
         // ListArtist Handling
-        listArtist = (ListView) rootView.findViewById(R.id.listview_artist);
-        List<Artist> emptyList = new ArrayList<>();
-        mArtistAdapter = new ArtistAdapter(getActivity(), emptyList);
-        listArtist.setAdapter(mArtistAdapter);
+        listArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
+        mArtistAdapter = new ArtistAdapter(getActivity(), new ArrayList<Artist>());
+        listArtistView.setAdapter(mArtistAdapter);
 
-        // Click handling on item artist
-        listArtist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Click handling on item searchView
+        listArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String selectedArtist = mArtistAdapter.getItem(position).name;
+                Artist selectedArtist = mArtistAdapter.getItem(position);
 
                 // Toast version
-                Toast.makeText(getActivity(), selectedArtist, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
 
                 // Start TracksActivity
-                Intent intent = new Intent(getActivity(), TracksActivity.class).
-                        putExtra(Intent.EXTRA_TEXT, selectedArtist);
+                Intent intent = new Intent(getActivity(), TracksActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, selectedArtist.name);
                 startActivity(intent);
             }
         });
@@ -123,7 +122,7 @@ public class ArtistFragment extends Fragment {
                 }            }
 
 /*
-            // logcat: Top Ten Tracks for most famous artist named on previous search
+            // logcat: Top Ten Tracks for most famous searchView named on previous search
             TracksPager resultsTracks = service.searchTracks(artists.get(0).name);
             List<Track> tracks = resultsTracks.tracks.items;
             for (int i = 0; i < 10; i++) {

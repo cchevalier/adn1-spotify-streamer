@@ -32,37 +32,37 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
+        // Creates or Retrieves ViewHolder
         ViewHolder holder = null;
-
-        if(v == null) {
-            v = mLayoutInflater.inflate(R.layout.list_item_artist, parent, false);
-
-            holder = new ViewHolder();
-            holder.name = (TextView) v.findViewById(R.id.list_item_artist_name);
-            holder.popularity = (TextView) v.findViewById(R.id.list_item_artist_popularity);
-            holder.image = (ImageView) v.findViewById(R.id.list_item_artist_image);
-            v.setTag(holder);
+        if(convertView == null) {
+            convertView = mLayoutInflater.inflate(R.layout.list_item_artist, parent, false);
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) v.getTag();
+            holder = (ViewHolder) convertView.getTag();
         }
 
+        // Set Artist data to Views
         final Artist artist = getItem(position);
-
-        holder.name.setText(artist.name);
-        holder.popularity.setText(artist.popularity.toString());
-
+        holder.nameView.setText(artist.name);
+        holder.popularityView.setText(artist.popularity.toString());
         if (artist.images.size() > 0) {
-            Picasso.with(getContext()).load(artist.images.get(0).url).into(holder.image);
+            Picasso.with(getContext()).load(artist.images.get(0).url).into(holder.imageView);
         }
 
-        return v;
+        return convertView;
     }
 
 
     class ViewHolder {
-        TextView name;
-        TextView popularity;
-        ImageView image;
+        TextView nameView;
+        TextView popularityView;
+        ImageView imageView;
+
+        public ViewHolder(View v) {
+            nameView = (TextView) v.findViewById(R.id.list_item_artist_name);
+            popularityView = (TextView) v.findViewById(R.id.list_item_artist_popularity);
+            imageView = (ImageView) v.findViewById(R.id.list_item_artist_image);
+        }
     }
 }

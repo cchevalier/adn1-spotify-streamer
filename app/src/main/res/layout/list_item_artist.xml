@@ -10,7 +10,7 @@
         android:id="@+id/list_item_artist_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:gravity="center_vertical"
+        android:gravity="clip_horizontal"
         android:padding="10dp"
         android:src="@android:drawable/ic_dialog_info"
         tools:background="#F09664" />
