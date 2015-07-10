@@ -19,3 +19,6 @@ by CChevalier, July 2015.
 - Tutos Android France
     - [ListView] (http://tutos-android-france.com/listview-afficher-une-liste-delements/)
     - [Picasso] (http://tutos-android-france.com/picasso/)
+
+- [Udacity Discussion Forum - ADnd - P1](https://discussions.udacity.com/c/nd801-2015-05-28/p1-spotify-streamer-stage-1)
+- [Udacity's Android Developer Nanodegree] (https://plus.google.com/communities/109766100514206800627)
