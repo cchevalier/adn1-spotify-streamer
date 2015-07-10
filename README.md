@@ -14,6 +14,8 @@ by CChevalier, July 2015.
     - [Customizing the ListView with Picasso] (http://ryanharter.com/blog/2014/02/23/layouts-and-adapters/)
 - Developer Phil
     - [Parcelable vs Serializable] (http://www.developerphil.com/parcelable-vs-serializable/)
+- Android Research Blog
+    - [Example usage of AppCompatActivity in Android] (https://androidresearch.wordpress.com/2015/04/24/example-usage-of-appcompatactivity-in-android/)
 
 #### References (french)
 - Tutos Android France
