@@ -18,7 +18,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.cchevalier.adnd.spotifystreamer.adapter.ArtistAdapter;
+import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
+import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +63,12 @@ public class ArtistFragment extends Fragment {
 
                     String search = searchView.getText().toString();
 
-                    InputMethodManager imm = (InputMethodManager)  getActivity().getSystemService(
+                    // Hide the kb
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                             Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 
+                    // Launch search as AsyncTask
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
                     task.execute(search);
 
@@ -75,9 +78,9 @@ public class ArtistFragment extends Fragment {
             }
         });
 
-        // ListArtist Handling
+        // ListArtistView + Adapter Handling
         listArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
-        mArtistAdapter = new ArtistAdapter(getActivity(), new ArrayList<Artist>());
+        mArtistAdapter = new ArtistAdapter(getActivity(), new ArrayList<MyArtist>());
         listArtistView.setAdapter(mArtistAdapter);
 
         // Click handling on item searchView
@@ -85,7 +88,7 @@ public class ArtistFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Artist selectedArtist = mArtistAdapter.getItem(position);
+                MyArtist selectedArtist = mArtistAdapter.getItem(position);
 
                 // Toast version
                 Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
@@ -102,10 +105,10 @@ public class ArtistFragment extends Fragment {
     }
 
 
-    public class SearchSpotifyForArtist extends AsyncTask<String, Void, List<Artist>> {
+    public class SearchSpotifyForArtist extends AsyncTask<String, Void, List<MyArtist>> {
 
         @Override
-        protected List<Artist> doInBackground(String... params) {
+        protected List<MyArtist> doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -116,11 +119,15 @@ public class ArtistFragment extends Fragment {
 
             // A basic search on artists named params[0]
             ArtistsPager resultsArtists = service.searchArtists(params[0]);
-            List<Artist> artists = resultsArtists.artists.items;
 
-            // logcat:
-            for (int i = 0; i < artists.size(); i++) {
-                Artist artist = artists.get(i);
+
+            List<MyArtist> artists = new ArrayList<MyArtist>();
+
+            int count = resultsArtists.artists.items.size();
+            for (int i = 0; i < count; i++) {
+                Artist artist = resultsArtists.artists.items.get(i);
+                artists.add(new MyArtist(artist));
+
                 Log.i("SAPI", i + " " + artist.name);
                 Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
                 Log.i("SAPI", i + "   id: " + artist.id);
@@ -143,7 +150,7 @@ public class ArtistFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<Artist> artists) {
+        protected void onPostExecute(List<MyArtist> artists) {
             //super.onPostExecute(aVoid);
 
             if (artists != null) {

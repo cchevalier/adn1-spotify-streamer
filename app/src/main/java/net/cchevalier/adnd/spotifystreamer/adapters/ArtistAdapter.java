@@ -1,4 +1,4 @@
-package net.cchevalier.adnd.spotifystreamer.adapter;
+package net.cchevalier.adnd.spotifystreamer.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,19 +11,18 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import net.cchevalier.adnd.spotifystreamer.R;
+import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Artist;
 
 /**
  * Created by cch on 09/07/2015.
  */
-public class ArtistAdapter extends ArrayAdapter<Artist> {
+public class ArtistAdapter extends ArrayAdapter<MyArtist> {
 
     private LayoutInflater mLayoutInflater;
 
-    public ArtistAdapter(Context context, List<Artist> objects) {
+    public ArtistAdapter(Context context, List<MyArtist> objects) {
         super(context, 0, objects);
         mLayoutInflater = LayoutInflater.from(context);
     }
@@ -32,24 +31,23 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // Creates or Retrieves ViewHolder
+        // Retrieves or Creates ViewHolder
         ViewHolder holder = null;
-        if(convertView == null) {
+        if(convertView != null) {
+            holder = (ViewHolder) convertView.getTag();
+        } else {
             convertView = mLayoutInflater.inflate(R.layout.list_item_artist, parent, false);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
         }
 
         // Set Artist data to Views
-        final Artist artist = getItem(position);
+        final MyArtist artist = getItem(position);
         holder.nameView.setText(artist.name);
         holder.popularityView.setText(artist.popularity.toString());
-        if (artist.images.size() > 0) {
-            Picasso.with(getContext()).load(artist.images.get(0).url).into(holder.imageView);
+        if (artist.imageLargeUrl != null) {
+            Picasso.with(getContext()).load(artist.imageLargeUrl).into(holder.imageView);
         }
-
         return convertView;
     }
 
