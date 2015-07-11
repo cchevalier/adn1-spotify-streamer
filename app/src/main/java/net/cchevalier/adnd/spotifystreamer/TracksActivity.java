@@ -14,6 +14,7 @@ public class TracksActivity extends AppCompatActivity {
 
     static final String ARTIST_SELECTED = "artistSelected";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,26 +26,12 @@ public class TracksActivity extends AppCompatActivity {
 
             Intent intent = getIntent();
             if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-                MyArtist artist = (MyArtist)intent.getParcelableExtra(ARTIST_SELECTED);
+                MyArtist artist = intent.getParcelableExtra(ARTIST_SELECTED);
                 actionBar.setSubtitle(artist.name);
             }
-
         }
     }
 
-/*
-* https://discussions.udacity.com/t/back-works-rotation-works-but-up-doesnt/21564/2
-*//*
-
-    @Override
-    public boolean onSupportNavigateUp(){
-        if(!super.onSupportNavigateUp()){
-            finish();
-        }
-        return true;
-    }
-
-*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,14 +51,6 @@ public class TracksActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
-/*
-        // http://stackoverflow.com/questions/22182888/actionbar-up-button-destroys-parent-activity-back-does-not
-        if (id == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-*/
 
         return super.onOptionsItemSelected(item);
     }

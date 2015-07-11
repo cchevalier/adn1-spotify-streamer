@@ -8,31 +8,34 @@
 
     <ImageView
         android:id="@+id/list_item_album_image"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:padding="15dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:gravity="clip_horizontal"
+        android:padding="10dp"
         android:src="@android:drawable/ic_menu_help"
         tools:background ="#F09664" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/list_item_track_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="15dp"
+            android:padding="10dp"
+            android:textSize="16sp"
             tools:text="Track"></TextView>
 
         <TextView
             android:id="@+id/list_item_album_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:padding="15dp"
+            android:gravity="right"
+            android:padding="10dp"
+            android:textSize="10sp"
             tools:text="Album"></TextView>
 
 

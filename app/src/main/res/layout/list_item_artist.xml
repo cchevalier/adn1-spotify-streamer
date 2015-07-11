@@ -27,8 +27,8 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:padding="10dp"
-            tools:text="Artist"
-            android:textSize="16sp"></TextView>
+            android:textSize="16sp"
+            tools:text="Artist"></TextView>
 
         <TextView
             android:id="@+id/list_item_artist_popularity"
@@ -36,8 +36,8 @@
             android:layout_height="match_parent"
             android:gravity="right"
             android:padding="10dp"
-            tools:text="70"
-            android:textSize="10sp"></TextView>
+            android:textSize="10sp"
+            tools:text="70"></TextView>
 
 
     </LinearLayout>

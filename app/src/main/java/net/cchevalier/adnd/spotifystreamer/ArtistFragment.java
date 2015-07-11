@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
@@ -59,7 +58,7 @@ public class ArtistFragment extends Fragment {
             artistsFound = savedInstanceState.getParcelableArrayList(ARTISTS_FOUND);
         } else {
             searchField = "";
-            artistsFound = new ArrayList<MyArtist>();
+            artistsFound = new ArrayList<>();
         }
     }
 
@@ -113,13 +112,11 @@ public class ArtistFragment extends Fragment {
                 MyArtist selectedArtist = artistAdapter.getItem(position);
 
                 // Toast version
-                Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
 
                 // Start TracksActivity
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
                 intent.putExtra(ARTIST_SELECTED, selectedArtist);
-//                intent.putExtra("ARTIST_NAME", selectedArtist.name);
-//                intent.putExtra("ARTIST_ID", selectedArtist.id);
                 startActivity(intent);
             }
         });
@@ -161,7 +158,7 @@ public class ArtistFragment extends Fragment {
             ArtistsPager resultsArtists = service.searchArtists(params[0]);
 
 
-            ArrayList<MyArtist> artists = new ArrayList<MyArtist>();
+            ArrayList<MyArtist> artists = new ArrayList<>();
 
             int count = resultsArtists.artists.items.size();
             for (int i = 0; i < count; i++) {
@@ -176,15 +173,6 @@ public class ArtistFragment extends Fragment {
                     Log.i("SAPI", i + "  url: " + artist.images.get(0).url);
                 }            }
 
-/*
-            // logcat: Top Ten Tracks for most famous searchView named on previous search
-            TracksPager resultsTracks = service.searchTracks(artists.get(0).name);
-            List<Track> tracks = resultsTracks.tracks.items;
-            for (int i = 0; i < 10; i++) {
-                Track track = tracks.get(i);
-                Log.i("SAPI", i + " - " + track.name );
-            }
-*/
 
             return artists;
         }
