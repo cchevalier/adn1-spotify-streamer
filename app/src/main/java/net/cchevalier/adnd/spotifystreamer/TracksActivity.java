@@ -7,8 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+
 
 public class TracksActivity extends AppCompatActivity {
+
+    static final String ARTIST_SELECTED = "artistSelected";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +24,9 @@ public class TracksActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
 
             Intent intent = getIntent();
-            if (intent != null && intent.hasExtra("ARTIST_NAME")) {
-                String artist = intent.getStringExtra("ARTIST_NAME");
-                actionBar.setSubtitle(artist);
+            if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
+                MyArtist artist = (MyArtist)intent.getParcelableExtra(ARTIST_SELECTED);
+                actionBar.setSubtitle(artist.name);
             }
 
         }
@@ -61,11 +65,13 @@ public class TracksActivity extends AppCompatActivity {
             return true;
         }
 
+/*
         // http://stackoverflow.com/questions/22182888/actionbar-up-button-destroys-parent-activity-back-does-not
         if (id == android.R.id.home) {
             onBackPressed();
             return true;
         }
+*/
 
         return super.onOptionsItemSelected(item);
     }

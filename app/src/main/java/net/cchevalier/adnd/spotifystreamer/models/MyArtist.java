@@ -48,7 +48,7 @@ public class MyArtist implements Parcelable {
     }
 
 
-    public final Parcelable.Creator<MyArtist> CREATOR = new Parcelable.Creator<MyArtist>() {
+    public static final Parcelable.Creator<MyArtist> CREATOR = new Parcelable.Creator<MyArtist>() {
 
         @Override
         public MyArtist createFromParcel(Parcel source) {

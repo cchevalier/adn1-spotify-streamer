@@ -12,6 +12,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,8 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  */
 public class TracksFragment extends Fragment {
+
+    static final String ARTIST_SELECTED = "artistSelected";
 
     ListView listTrack;
     ArrayAdapter<String> mTrackAdapter;
@@ -33,12 +37,13 @@ public class TracksFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
         // Handling of intent
-        String artist = "dummy";
+        String artistName = "dummy";
         String artistId = "dummy";
         Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("ARTIST_ID")) {
-            artist = intent.getStringExtra("ARTIST_NAME");
-            artistId = intent.getStringExtra("ARTIST_ID");
+        if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
+            MyArtist artist = (MyArtist)intent.getParcelableExtra(ARTIST_SELECTED);
+            artistName = artist.name;
+            artistId = artist.id;
             ((TextView) rootView.findViewById(R.id.artist_header_view)).setText(artistId);
         }
 
@@ -48,7 +53,7 @@ public class TracksFragment extends Fragment {
         // Build a dummy list of tracks (temporary)
         List<String> tracks = new ArrayList<>();
         for (Integer i = 1; i <= 10; i++) {
-            String tmp = artist + " - Track " + i.toString();
+            String tmp = artistName + " - Track " + i.toString();
             tracks.add(tmp);
         }
 

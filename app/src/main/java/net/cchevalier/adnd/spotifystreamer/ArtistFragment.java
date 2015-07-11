@@ -22,7 +22,6 @@ import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -35,9 +34,16 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  */
 public class ArtistFragment extends Fragment {
 
+    static final String SEARCH_FIELD = "searchField";
+    static final String ARTISTS_FOUND = "artistsFound";
+    static final String ARTIST_SELECTED = "artistSelected";
+
     EditText searchView;
     ListView listArtistView;
-    ArtistAdapter mArtistAdapter;
+    ArtistAdapter artistAdapter;
+
+    String searchField;
+    ArrayList<MyArtist> artistsFound;
 
 
     public ArtistFragment() {
@@ -45,13 +51,33 @@ public class ArtistFragment extends Fragment {
 
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            searchField = savedInstanceState.getString(SEARCH_FIELD);
+            artistsFound = savedInstanceState.getParcelableArrayList(ARTISTS_FOUND);
+        } else {
+            searchField = "";
+            artistsFound = new ArrayList<MyArtist>();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Retrieves Search View
+        // Retrieves searchView / Set value to searchField (possibly restored)
         searchView = (EditText) rootView.findViewById(R.id.search_view);
+        searchView.setText(searchField);
+
+        // Retrieves listArtistView / Set Adapter + value (possibly restored)
+        listArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
+        artistAdapter = new ArtistAdapter(getActivity(), artistsFound);
+        listArtistView.setAdapter(artistAdapter);
+
 
         // Launching search using setOnEditorActionListener
         searchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -61,7 +87,7 @@ public class ArtistFragment extends Fragment {
 
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 
-                    String search = searchView.getText().toString();
+                    searchField = searchView.getText().toString();
 
                     // Hide the kb
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
@@ -70,7 +96,7 @@ public class ArtistFragment extends Fragment {
 
                     // Launch search as AsyncTask
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
-                    task.execute(search);
+                    task.execute(searchField);
 
                     handled = true;
                 }
@@ -78,25 +104,22 @@ public class ArtistFragment extends Fragment {
             }
         });
 
-        // ListArtistView + Adapter Handling
-        listArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
-        mArtistAdapter = new ArtistAdapter(getActivity(), new ArrayList<MyArtist>());
-        listArtistView.setAdapter(mArtistAdapter);
 
-        // Click handling on item searchView
+        // Click handling on item listArtistView
         listArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                MyArtist selectedArtist = mArtistAdapter.getItem(position);
+                MyArtist selectedArtist = artistAdapter.getItem(position);
 
                 // Toast version
                 Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
 
                 // Start TracksActivity
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
-                intent.putExtra("ARTIST_NAME", selectedArtist.name);
-                intent.putExtra("ARTIST_ID", selectedArtist.id);
+                intent.putExtra(ARTIST_SELECTED, selectedArtist);
+//                intent.putExtra("ARTIST_NAME", selectedArtist.name);
+//                intent.putExtra("ARTIST_ID", selectedArtist.id);
                 startActivity(intent);
             }
         });
@@ -105,10 +128,27 @@ public class ArtistFragment extends Fragment {
     }
 
 
-    public class SearchSpotifyForArtist extends AsyncTask<String, Void, List<MyArtist>> {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        // our own data to preserve
+        outState.putString(SEARCH_FIELD, searchField);
+        outState.putParcelableArrayList(ARTISTS_FOUND, artistsFound);
+
+        super.onSaveInstanceState(outState);
+    }
+
+
+
+
+/*
+*   ASYNC TASK
+*
+* */
+    public class SearchSpotifyForArtist extends AsyncTask<String, Void, ArrayList<MyArtist>> {
 
         @Override
-        protected List<MyArtist> doInBackground(String... params) {
+        protected ArrayList<MyArtist> doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -121,7 +161,7 @@ public class ArtistFragment extends Fragment {
             ArtistsPager resultsArtists = service.searchArtists(params[0]);
 
 
-            List<MyArtist> artists = new ArrayList<MyArtist>();
+            ArrayList<MyArtist> artists = new ArrayList<MyArtist>();
 
             int count = resultsArtists.artists.items.size();
             for (int i = 0; i < count; i++) {
@@ -150,18 +190,11 @@ public class ArtistFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<MyArtist> artists) {
-            //super.onPostExecute(aVoid);
-
+        protected void onPostExecute(ArrayList<MyArtist> artists) {
             if (artists != null) {
-                mArtistAdapter.clear();
-
-                mArtistAdapter.addAll(artists);
-/*
-                for (int i = 0; i < artists.size(); i++) {
-                    mArtistAdapter.add(artists.get(i));
-                }
-*/
+                artistsFound = artists;
+                artistAdapter.clear();
+                artistAdapter.addAll(artists);
             }
         }
 
