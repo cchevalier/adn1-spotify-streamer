@@ -8,10 +8,10 @@
 
     <ImageView
         android:id="@+id/list_item_artist_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
         android:gravity="clip_horizontal"
-        android:padding="10dp"
+        android:padding="5dp"
         android:src="@android:drawable/ic_menu_help"
         tools:background="#F09664" />
 
@@ -26,8 +26,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
+            android:lines="1"
             android:padding="10dp"
-            android:textSize="16sp"
+            android:textSize="@dimen/abc_text_size_medium_material"
             tools:text="Artist"></TextView>
 
         <TextView
@@ -35,10 +36,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="right"
+            android:lines="1"
             android:padding="10dp"
-            android:textSize="10sp"
+            android:textSize="@dimen/abc_text_size_small_material"
             tools:text="70"></TextView>
 
-
     </LinearLayout>
+
 </LinearLayout>

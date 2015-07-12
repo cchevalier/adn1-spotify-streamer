@@ -16,6 +16,8 @@ import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 import java.util.List;
 
 /**
+ * A Custom ArrayAdapter for MyTrack
+ *
  * Created by cch on 11/07/2015.
  */
 public class TrackAdapter extends ArrayAdapter<MyTrack> {
@@ -45,12 +47,19 @@ public class TrackAdapter extends ArrayAdapter<MyTrack> {
         final MyTrack track = getItem(position);
         holder.trackView.setText(track.name);
         holder.albumView.setText(track.album);
-        if (track.imageLargeUrl != null) {
-            Picasso.with(getContext()).load(track.imageLargeUrl).into(holder.imageView);
+        if (track.UrlMediumImage != null) {
+            Picasso.with(getContext())
+                    .load(track.UrlMediumImage)
+                    .resize(90, 90)
+                    .centerCrop()
+                    .into(holder.imageView);
+        } else {
+            holder.imageView.setImageResource(android.R.drawable.ic_menu_help);
         }
 
         return convertView;
     }
+
 
     class ViewHolder {
         TextView trackView;
@@ -63,5 +72,4 @@ public class TrackAdapter extends ArrayAdapter<MyTrack> {
             imageView = (ImageView) v.findViewById(R.id.list_item_album_image);
         }
     }
-
 }

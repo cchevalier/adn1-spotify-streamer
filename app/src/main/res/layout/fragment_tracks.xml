@@ -9,11 +9,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="net.cchevalier.adnd.spotifystreamer.TracksFragment">
 
+<!--
     <TextView
         android:id="@+id/artist_header_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Selected artist Top Tracks:"/>
+-->
 
     <ListView
         android:id="@+id/listview_tracks"

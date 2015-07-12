@@ -16,6 +16,8 @@ import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import java.util.List;
 
 /**
+ * A Custom ArrayAdapter for MyArtist
+ *
  * Created by cch on 09/07/2015.
  */
 public class ArtistAdapter extends ArrayAdapter<MyArtist> {
@@ -45,9 +47,16 @@ public class ArtistAdapter extends ArrayAdapter<MyArtist> {
         final MyArtist artist = getItem(position);
         holder.nameView.setText(artist.name);
         holder.popularityView.setText(artist.popularity.toString());
-        if (artist.imageLargeUrl != null) {
-            Picasso.with(getContext()).load(artist.imageLargeUrl).into(holder.imageView);
+        if (artist.UrlMediumImage != null) {
+            Picasso.with(getContext())
+                    .load(artist.UrlMediumImage)
+                    .resize(90,90)
+                    .centerCrop()
+                    .into(holder.imageView);
+        } else {
+            holder.imageView.setImageResource(android.R.drawable.ic_menu_help);
         }
+
         return convertView;
     }
 

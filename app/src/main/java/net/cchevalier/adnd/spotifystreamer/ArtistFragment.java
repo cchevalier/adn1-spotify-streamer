@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
@@ -29,7 +31,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * ArtistFragment
  */
 public class ArtistFragment extends Fragment {
 
@@ -111,9 +113,6 @@ public class ArtistFragment extends Fragment {
 
                 MyArtist selectedArtist = artistAdapter.getItem(position);
 
-                // Toast version
-                //Toast.makeText(getActivity(), selectedArtist.name, Toast.LENGTH_LONG).show();
-
                 // Start TracksActivity
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
                 intent.putExtra(ARTIST_SELECTED, selectedArtist);
@@ -139,7 +138,7 @@ public class ArtistFragment extends Fragment {
 
 
 /*
-*   ASYNC TASK
+*   ASYNC TASK: SearchSpotifyForArtist
 *
 * */
     public class SearchSpotifyForArtist extends AsyncTask<String, Void, ArrayList<MyArtist>> {
@@ -151,12 +150,12 @@ public class ArtistFragment extends Fragment {
                 return null;
             }
 
+            // Start Spotify services
             SpotifyApi api = new SpotifyApi();
             SpotifyService service = api.getService();
 
             // A basic search on artists named params[0]
             ArtistsPager resultsArtists = service.searchArtists(params[0]);
-
 
             ArrayList<MyArtist> artists = new ArrayList<>();
 
@@ -166,22 +165,33 @@ public class ArtistFragment extends Fragment {
                 artists.add(new MyArtist(artist));
 
                 Log.i("SAPI", i + " " + artist.name);
-                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
-                Log.i("SAPI", i + "   id: " + artist.id);
-                Log.i("SAPI", i + "  uri: " + artist.uri);
+//                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
+//                Log.i("SAPI", i + "   id: " + artist.id);
+//                Log.i("SAPI", i + "  uri: " + artist.uri);
                 if (artist.images.size() > 0) {
                     Log.i("SAPI", i + "  url: " + artist.images.get(0).url);
-                }            }
-
+                }
+            }
 
             return artists;
         }
 
-        @Override
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        artistAdapter.clear();
+    }
+
+
+    @Override
         protected void onPostExecute(ArrayList<MyArtist> artists) {
-            if (artists != null) {
+            if (artists == null || artists.isEmpty()) {
+                Toast toast = Toast.makeText(getActivity(), " No artist found", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+            } else {
                 artistsFound = artists;
-                artistAdapter.clear();
                 artistAdapter.addAll(artists);
             }
         }

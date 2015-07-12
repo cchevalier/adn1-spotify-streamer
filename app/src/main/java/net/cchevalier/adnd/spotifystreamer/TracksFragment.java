@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.adapters.TrackAdapter;
@@ -27,7 +26,7 @@ import kaaes.spotify.webapi.android.models.Tracks;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * TracksFragment
  */
 public class TracksFragment extends Fragment {
 
@@ -47,13 +46,11 @@ public class TracksFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
         // Handling of intent
-        String artistName = "dummy";
-        String artistId = "dummy";
+        String artistId = "";
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
             MyArtist artist = intent.getParcelableExtra(ARTIST_SELECTED);
             artistId = artist.id;
-            ((TextView) rootView.findViewById(R.id.artist_header_view)).setText(artistId);
         }
 
         // Retrieve listTrackView
@@ -86,7 +83,7 @@ public class TracksFragment extends Fragment {
 
 
     /*
-    * ASYNC TASK
+    * ASYNC TASK: SearchSpotifyForTopTrack
     *
     * */
     public class SearchSpotifyForTopTrack extends AsyncTask<String, Void, ArrayList<MyTrack>> {
@@ -98,18 +95,18 @@ public class TracksFragment extends Fragment {
                 return null;
             }
 
-
-            // Build a dummy list of tracks (temporary)
-            SpotifyApi api = new SpotifyApi();
-            SpotifyService service = api.getService();
-
             String artistId = params[0];
             String country = params[1];
 
-            Map<String, Object> options = new HashMap<>();
-            options.put(service.COUNTRY, country);
+            // Start Spotify services
+            SpotifyApi api = new SpotifyApi();
+            SpotifyService service = api.getService();
 
-            // Top Ten Tracks for most famous searchView named on previous search
+            // Set country
+            Map<String, Object> options = new HashMap<>();
+            options.put("country", country);
+
+            // Top Ten Tracks for most famous searchView
             Tracks results = service.getArtistTopTrack(artistId, options);
 
             ArrayList<MyTrack> output  = new ArrayList<>();
@@ -117,16 +114,26 @@ public class TracksFragment extends Fragment {
                 output.add(new MyTrack(results.tracks.get(i)));
             }
 
-
             return output;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            trackAdapter.clear();
         }
 
         @Override
         protected void onPostExecute(ArrayList<MyTrack> tracks) {
-            super.onPostExecute(tracks);
+//            super.onPostExecute(tracks);
 
-            if (tracks != null) {
-                trackAdapter.clear();
+            if (tracks == null || tracks.isEmpty()) {
+                Toast toast = Toast.makeText(getActivity(), " No track found", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+            } else {
+                tracksFound = tracks;
                 trackAdapter.addAll(tracks);
             }
         }
