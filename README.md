@@ -7,6 +7,16 @@ by CChevalier, July 2015.
 
 ## Part 1
 
+## Update for submission 1.1:
+First submission failed for mainly two reasons:
+1. App was crashing if there was no network connection
+2. Top ten tracks queried results were not retained on rotation change
+
+FIXES:
+1. Use try / catch statement around code fetching data with basic treatment of the Retrofit error. Also use an internal flag fetchErrorFlag to issue a specific Toast on Post Execution (see ArtistFragment.java and TracksFragment.java)
+
+
+## Original message for submission 1.0:
 As the deadline of July 13th is getting close and I don't want to restart stage 1 with the Movies App, I add to make some choices to finalize a first version for submission, see below:
 
 ### Known issues or Personal Choices

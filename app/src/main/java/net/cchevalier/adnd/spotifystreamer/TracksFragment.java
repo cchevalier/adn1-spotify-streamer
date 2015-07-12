@@ -23,6 +23,7 @@ import java.util.Map;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Tracks;
+import retrofit.RetrofitError;
 
 
 /**
@@ -88,6 +89,8 @@ public class TracksFragment extends Fragment {
     * */
     public class SearchSpotifyForTopTrack extends AsyncTask<String, Void, ArrayList<MyTrack>> {
 
+        boolean fetchErrorFlag;
+
         @Override
         protected ArrayList<MyTrack> doInBackground(String... params) {
 
@@ -107,7 +110,14 @@ public class TracksFragment extends Fragment {
             options.put("country", country);
 
             // Top Ten Tracks for most famous searchView
-            Tracks results = service.getArtistTopTrack(artistId, options);
+            Tracks results;
+            try {
+                results = service.getArtistTopTrack(artistId, options);
+            } catch (RetrofitError e) {
+                e.printStackTrace();
+                fetchErrorFlag = true;
+                return null;
+            }
 
             ArrayList<MyTrack> output  = new ArrayList<>();
             for (int i = 0; i < results.tracks.size(); i++) {
@@ -121,12 +131,21 @@ public class TracksFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            fetchErrorFlag = false;
             trackAdapter.clear();
         }
 
         @Override
         protected void onPostExecute(ArrayList<MyTrack> tracks) {
 //            super.onPostExecute(tracks);
+
+            if (fetchErrorFlag){
+                Toast toast = Toast.makeText(getActivity(),
+                        "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+                return;
+            }
 
             if (tracks == null || tracks.isEmpty()) {
                 Toast toast = Toast.makeText(getActivity(), " No track found", Toast.LENGTH_LONG);
