@@ -32,6 +32,7 @@ import retrofit.RetrofitError;
 public class TracksFragment extends Fragment {
 
     static final String ARTIST_SELECTED = "artistSelected";
+    static final String TRACKS_FOUND = "tracksFound";
 
     ListView listTrackView;
     TrackAdapter trackAdapter;
@@ -40,6 +41,7 @@ public class TracksFragment extends Fragment {
 
     public TracksFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,17 +56,16 @@ public class TracksFragment extends Fragment {
             artistId = artist.id;
         }
 
+        if (savedInstanceState != null) {
+            tracksFound = savedInstanceState.getParcelableArrayList(TRACKS_FOUND);
+        }
+
         // Retrieve listTrackView
         listTrackView = (ListView) rootView.findViewById(R.id.listview_tracks);
 
         // Create  / Assign the track Array Adapter
         trackAdapter = new TrackAdapter(getActivity(), tracksFound);
         listTrackView.setAdapter(trackAdapter);
-
-
-        // Launch tracks search as AsyncTask
-        SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
-        task.execute(artistId, "DK");
 
 
         // Event: Click on a track
@@ -79,14 +80,28 @@ public class TracksFragment extends Fragment {
             }
         });
 
+        if (tracksFound.isEmpty()) {
+            // Launch tracks search as AsyncTask
+            SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
+            task.execute(artistId, "DK");
+        }
+
         return rootView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        // our own data to preserve
+        outState.putParcelableArrayList(TRACKS_FOUND, tracksFound);
+
+        super.onSaveInstanceState(outState);
+    }
 
     /*
-    * ASYNC TASK: SearchSpotifyForTopTrack
-    *
-    * */
+        * ASYNC TASK: SearchSpotifyForTopTrack
+        *
+        * */
     public class SearchSpotifyForTopTrack extends AsyncTask<String, Void, ArrayList<MyTrack>> {
 
         boolean fetchErrorFlag;

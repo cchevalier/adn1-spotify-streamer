@@ -8,12 +8,19 @@ by CChevalier, July 2015.
 ## Part 1
 
 ## Update for submission 1.1:
+Thanks to the reviewer for a fast and very valuable review of my first submission.
+
 First submission failed for mainly two reasons:
-1. App was crashing if there was no network connection
-2. Top ten tracks queried results were not retained on rotation change
+1. App was crashing if there was no network connection (I had completely forgotten that!)
+2. Top ten tracks queried results were not retained on rotation change (here again I knew something was weired but didn't connect the dots properly...)
+
 
 FIXES:
 1. Use try / catch statement around code fetching data with basic treatment of the Retrofit error. Also use an internal flag fetchErrorFlag to issue a specific Toast on Post Execution (see ArtistFragment.java and TracksFragment.java)
+2. Implement onSaveInstanceState in TracksFragment for tracksFound data, retrieves it in onCreateView
+
+Just a final remark:
+While retrieving data from savedInstanceState I do not check if the requested data type is there (I take for granted that since my app put it there then there it is...) I guess a more robust approach would be to try/catch all these get calls. I will need to investigate this more in the future but reviewer insights is welcome.
 
 
 ## Original message for submission 1.0:
