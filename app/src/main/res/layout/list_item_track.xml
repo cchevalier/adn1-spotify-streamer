@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/list_item_artist_image"
+        android:id="@+id/list_item_album_image"
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:gravity="clip_horizontal"
@@ -22,24 +22,24 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/list_item_artist_name"
+            android:id="@+id/list_item_track_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
             android:lines="1"
             android:padding="10dp"
             android:textSize="@dimen/abc_text_size_medium_material"
-            tools:text="Artist"></TextView>
+            tools:text="Track"></TextView>
 
         <TextView
-            android:id="@+id/list_item_artist_popularity"
+            android:id="@+id/list_item_album_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="right"
+            android:gravity="left"
             android:lines="1"
             android:padding="10dp"
             android:textSize="@dimen/abc_text_size_small_material"
-            tools:text="70"></TextView>
+            tools:text="Album"></TextView>
+
 
     </LinearLayout>
 
