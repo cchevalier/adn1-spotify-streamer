@@ -47,7 +47,8 @@ public class TrackAdapter extends ArrayAdapter<MyTrack> {
         final MyTrack track = getItem(position);
         holder.trackView.setText(track.name);
         holder.albumView.setText(track.album);
-        if (track.UrlMediumImage != null) {
+        // FIX: check on Url not empty to avoid IllegalArgumentException
+        if (track.UrlMediumImage != null && track.UrlMediumImage != "") {
             Picasso.with(getContext())
                     .load(track.UrlMediumImage)
                     .resize(90, 90)

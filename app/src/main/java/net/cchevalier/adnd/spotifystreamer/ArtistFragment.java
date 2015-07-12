@@ -28,6 +28,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import retrofit.RetrofitError;
 
 
 /**
@@ -143,6 +144,8 @@ public class ArtistFragment extends Fragment {
 * */
     public class SearchSpotifyForArtist extends AsyncTask<String, Void, ArrayList<MyArtist>> {
 
+        boolean fetchErrorFlag;
+
         @Override
         protected ArrayList<MyArtist> doInBackground(String... params) {
 
@@ -155,10 +158,17 @@ public class ArtistFragment extends Fragment {
             SpotifyService service = api.getService();
 
             // A basic search on artists named params[0]
-            ArtistsPager resultsArtists = service.searchArtists(params[0]);
+            ArtistsPager resultsArtists;
+            try {
+                resultsArtists = service.searchArtists(params[0]);
+            } catch (RetrofitError e){
+                e.printStackTrace();
+                fetchErrorFlag = true;
+                return null;
+            }
+
 
             ArrayList<MyArtist> artists = new ArrayList<>();
-
             int count = resultsArtists.artists.items.size();
             for (int i = 0; i < count; i++) {
                 Artist artist = resultsArtists.artists.items.get(i);
@@ -180,14 +190,24 @@ public class ArtistFragment extends Fragment {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        fetchErrorFlag = false;
         artistAdapter.clear();
     }
 
 
     @Override
         protected void onPostExecute(ArrayList<MyArtist> artists) {
+
+            if (fetchErrorFlag){
+                Toast toast = Toast.makeText(getActivity(),
+                        "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+                return;
+            }
+
             if (artists == null || artists.isEmpty()) {
-                Toast toast = Toast.makeText(getActivity(), " No artist found", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(getActivity(), "No artist found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
             } else {

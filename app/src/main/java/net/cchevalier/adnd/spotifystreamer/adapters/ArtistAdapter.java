@@ -47,7 +47,8 @@ public class ArtistAdapter extends ArrayAdapter<MyArtist> {
         final MyArtist artist = getItem(position);
         holder.nameView.setText(artist.name);
         holder.popularityView.setText(artist.popularity.toString());
-        if (artist.UrlMediumImage != null) {
+        // FIX: check on Url not empty to avoid IllegalArgumentException
+        if (artist.UrlMediumImage != null && artist.UrlMediumImage != "") {
             Picasso.with(getContext())
                     .load(artist.UrlMediumImage)
                     .resize(90,90)
