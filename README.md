@@ -5,6 +5,20 @@ ADnd-P1-SpotifyStreamer : A music streaming application.
 by CChevalier, July 2015.
 
 
+## Part 2
+
+#### References
+
+
+#### References (french)
+
+
+#### Discussions groups
+- [Udacity Discussion Forum - ADnd - P2 Spotify ](https://discussions.udacity.com/c/nd801-2015-05-28/p1-spotify-streamer-stage-2)
+- [Google+ Udacity's Android Developer Nanodegree] (https://plus.google.com/communities/109766100514206800627)
+
+---
+
 ## Part 1
 
 ## Update for submission 1.1:
