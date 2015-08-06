@@ -72,11 +72,15 @@ public class TracksFragment extends Fragment {
         listTrackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // Stage 1: display toast instead of launching mediaPlayer
                 MyTrack selectedTrack = trackAdapter.getItem(position);
                 String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
                 Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
+
+
             }
         });
 
