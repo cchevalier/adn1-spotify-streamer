@@ -37,6 +37,7 @@ public class TracksFragment extends Fragment {
     ListView listTrackView;
     TrackAdapter trackAdapter;
 
+    MyArtist artist = null;
     ArrayList<MyTrack> tracksFound = new ArrayList<>();
 
     public TracksFragment() {
@@ -50,9 +51,10 @@ public class TracksFragment extends Fragment {
 
         // Handling of intent
         String artistId = "";
+
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-            MyArtist artist = intent.getParcelableExtra(ARTIST_SELECTED);
+            artist = intent.getParcelableExtra(ARTIST_SELECTED);
             artistId = artist.id;
         }
 
@@ -79,6 +81,12 @@ public class TracksFragment extends Fragment {
                 Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
+
+                // Stage 2: launch PlayerActivity
+                Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                intent.putExtra(ARTIST_SELECTED, artist);
+                intent.putParcelableArrayListExtra(TRACKS_FOUND, tracksFound);
+                startActivity(intent);
 
 
             }
