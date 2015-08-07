@@ -5,4 +5,5 @@
     <string name="artist_name">Artist\'s name:</string>
     <string name="search_header">Search for\:</string>
     <string name="title_activity_tracks">Top 10 Tracks</string>
+    <string name="title_activity_player">PlayerActivity</string>
 </resources>
