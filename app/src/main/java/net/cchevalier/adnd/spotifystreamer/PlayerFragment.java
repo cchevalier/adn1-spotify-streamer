@@ -23,9 +23,12 @@ public class PlayerFragment extends Fragment {
 
     static final String ARTIST_SELECTED = "artistSelected";
     static final String TRACKS_FOUND = "tracksFound";
+    static final String POSITION = "position";
+
 
     MyArtist artist = null;
     ArrayList<MyTrack> tracksFound = null;
+    int position = 0;
 
     TextView artistView;
     TextView albumView;
@@ -47,29 +50,33 @@ public class PlayerFragment extends Fragment {
         albumImageView = (ImageView) rootView.findViewById(R.id.mp_album_img);
 
         Intent intent = getActivity().getIntent();
+
         if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
             artist = intent.getParcelableExtra(ARTIST_SELECTED);
         }
         artistView.setText(artist.name);
 
+        if (intent != null && intent.hasExtra(POSITION)) {
+            position = intent.getIntExtra(POSITION, 0);
+        }
+
         if (intent != null && intent.hasExtra(TRACKS_FOUND)) {
             tracksFound = intent.getParcelableArrayListExtra(TRACKS_FOUND);
+        }
 
-            int position = 0;
-            MyTrack currentTrack = tracksFound.get(position);
+        MyTrack currentTrack = tracksFound.get(position);
 
-            albumView.setText(currentTrack.album);
-            trackView.setText(currentTrack.name);
-            if (currentTrack.UrlLargeImage != null && currentTrack.UrlLargeImage != "") {
-                Picasso.with(getActivity())
-                        .load(currentTrack.UrlLargeImage)
-                        .resize(300, 300)
-                        .centerCrop()
-                        .into(albumImageView);
-            } else {
-                albumImageView.setImageResource(android.R.drawable.ic_menu_help);
-            }
+        albumView.setText(currentTrack.album);
+        trackView.setText(currentTrack.name);
 
+        if (currentTrack.UrlLargeImage != null && currentTrack.UrlLargeImage != "") {
+            Picasso.with(getActivity())
+                    .load(currentTrack.UrlLargeImage)
+                    .resize(300, 300)
+                    .centerCrop()
+                    .into(albumImageView);
+        } else {
+            albumImageView.setImageResource(android.R.drawable.ic_menu_help);
         }
 
 

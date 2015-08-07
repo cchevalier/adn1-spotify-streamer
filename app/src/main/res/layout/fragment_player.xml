@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:text="@string/hello_world"
         android:layout_gravity="center"
+        android:padding="5dp"
         tools:text="Artist"
         />
 
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content"
         android:text="@string/hello_world"
         android:layout_gravity="center"
+        android:padding="5dp"
         tools:text="Album"
         />
 
@@ -43,7 +45,41 @@
         android:layout_height="wrap_content"
         android:text="@string/hello_world"
         android:layout_gravity="center"
+        android:padding="5dp"
         tools:text="Track"
         />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/button_previous"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_media_previous"
+            />
+
+        <ImageButton
+            android:id="@+id/button_play"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_media_play"
+            />
+
+        <ImageButton
+            android:id="@+id/button_next"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_media_next"
+            />
+    </LinearLayout>
 
 </LinearLayout>

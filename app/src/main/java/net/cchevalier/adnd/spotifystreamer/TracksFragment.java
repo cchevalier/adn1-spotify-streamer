@@ -33,6 +33,7 @@ public class TracksFragment extends Fragment {
 
     static final String ARTIST_SELECTED = "artistSelected";
     static final String TRACKS_FOUND = "tracksFound";
+    static final String POSITION = "position";
 
     ListView listTrackView;
     TrackAdapter trackAdapter;
@@ -76,14 +77,17 @@ public class TracksFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 // Stage 1: display toast instead of launching mediaPlayer
+/*
                 MyTrack selectedTrack = trackAdapter.getItem(position);
                 String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
                 Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
+*/
 
                 // Stage 2: launch PlayerActivity
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                intent.putExtra(POSITION, position);
                 intent.putExtra(ARTIST_SELECTED, artist);
                 intent.putParcelableArrayListExtra(TRACKS_FOUND, tracksFound);
                 startActivity(intent);
