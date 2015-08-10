@@ -68,7 +68,7 @@
             />
 
         <ImageButton
-            android:id="@+id/button_play"
+            android:id="@+id/button_play_plause"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@android:drawable/ic_media_play"

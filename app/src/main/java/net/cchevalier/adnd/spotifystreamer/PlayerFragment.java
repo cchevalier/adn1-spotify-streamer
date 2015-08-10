@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,6 +36,10 @@ public class PlayerFragment extends Fragment {
     ImageView albumImageView;
     TextView trackView;
 
+    ImageButton previousButton;
+    ImageButton playButton;
+    ImageButton nextButton;
+
     public PlayerFragment() {
     }
 
@@ -44,17 +49,21 @@ public class PlayerFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
+        // Retrieves views
         artistView = (TextView) rootView.findViewById(R.id.mp_artist);
         albumView = (TextView) rootView.findViewById(R.id.mp_album);
         trackView = (TextView) rootView.findViewById(R.id.mp_track);
         albumImageView = (ImageView) rootView.findViewById(R.id.mp_album_img);
 
+        previousButton = (ImageButton) rootView.findViewById(R.id.button_previous);
+        nextButton = (ImageButton) rootView.findViewById(R.id.button_next);
+
+        // Handles intent
         Intent intent = getActivity().getIntent();
 
         if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
             artist = intent.getParcelableExtra(ARTIST_SELECTED);
         }
-        artistView.setText(artist.name);
 
         if (intent != null && intent.hasExtra(POSITION)) {
             position = intent.getIntExtra(POSITION, 0);
@@ -63,11 +72,60 @@ public class PlayerFragment extends Fragment {
         if (intent != null && intent.hasExtra(TRACKS_FOUND)) {
             tracksFound = intent.getParcelableArrayListExtra(TRACKS_FOUND);
         }
+        updateTrack();
+
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (position > 0) {
+                    position--;
+                    updateTrack();
+                }
+            }
+        });
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (position < tracksFound.size() - 1) {
+                    position++;
+                    updateTrack();
+                }
+            }
+        });
+
+
+        return rootView;
+    }
+
+    private void updateTrack() {
+
+        artistView.setText(artist.name);
 
         MyTrack currentTrack = tracksFound.get(position);
 
         albumView.setText(currentTrack.album);
         trackView.setText(currentTrack.name);
+
+        if (position == 0) {
+            previousButton.setEnabled(false);
+            previousButton.setClickable(false);
+            previousButton.setVisibility(View.INVISIBLE);
+        } else {
+            previousButton.setEnabled(true);
+            previousButton.setClickable(true);
+            previousButton.setVisibility(View.VISIBLE);
+        }
+
+        if (position == tracksFound.size() - 1) {
+            nextButton.setEnabled(false);
+            nextButton.setClickable(false);
+            nextButton.setVisibility(View.INVISIBLE);
+        } else {
+            nextButton.setEnabled(true);
+            nextButton.setClickable(true);
+            nextButton.setVisibility(View.VISIBLE);
+        }
 
         if (currentTrack.UrlLargeImage != null && currentTrack.UrlLargeImage != "") {
             Picasso.with(getActivity())
@@ -78,9 +136,5 @@ public class PlayerFragment extends Fragment {
         } else {
             albumImageView.setImageResource(android.R.drawable.ic_menu_help);
         }
-
-
-
-        return rootView;
     }
 }

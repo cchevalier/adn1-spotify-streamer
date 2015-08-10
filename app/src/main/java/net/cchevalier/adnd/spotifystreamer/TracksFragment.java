@@ -87,9 +87,9 @@ public class TracksFragment extends Fragment {
 
                 // Stage 2: launch PlayerActivity
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
-                intent.putExtra(POSITION, position);
                 intent.putExtra(ARTIST_SELECTED, artist);
                 intent.putParcelableArrayListExtra(TRACKS_FOUND, tracksFound);
+                intent.putExtra(POSITION, position);
                 startActivity(intent);
 
 
@@ -97,7 +97,7 @@ public class TracksFragment extends Fragment {
         });
 
         if (tracksFound.isEmpty()) {
-            // Launch tracks search as AsyncTask
+            // Launch tracks search as AsyncTask with country = DK (hardcoded)
             SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
             task.execute(artistId, "DK");
         }
@@ -110,14 +110,15 @@ public class TracksFragment extends Fragment {
 
         // our own data to preserve
         outState.putParcelableArrayList(TRACKS_FOUND, tracksFound);
-
         super.onSaveInstanceState(outState);
     }
 
+
+
     /*
-        * ASYNC TASK: SearchSpotifyForTopTrack
-        *
-        * */
+    * ASYNC TASK: SearchSpotifyForTopTrack
+    *
+    * */
     public class SearchSpotifyForTopTrack extends AsyncTask<String, Void, ArrayList<MyTrack>> {
 
         boolean fetchErrorFlag;
