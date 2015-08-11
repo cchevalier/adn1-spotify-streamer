@@ -10,49 +10,47 @@
     tools:context="net.cchevalier.adnd.spotifystreamer.PlayerFragment">
 
     <TextView
+        tools:text="Artist"
         android:id="@+id/mp_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world"
         android:layout_gravity="center"
         android:padding="5dp"
-        tools:text="Artist"
         />
 
     <TextView
+        tools:text="Album"
         android:id="@+id/mp_album"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world"
         android:layout_gravity="center"
         android:padding="5dp"
-        tools:text="Album"
         />
 
     <ImageView
         android:id="@+id/mp_album_img"
+        tools:background="#F09664"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:padding="5dp"
         android:layout_gravity="center"
         android:src="@android:drawable/ic_menu_help"
-        tools:background="#F09664"
         />
 
     <TextView
         android:id="@+id/mp_track"
+        tools:text="Track"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world"
         android:layout_gravity="center"
         android:padding="5dp"
-        tools:text="Track"
         />
 
     <SeekBar
+        android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar" />
+        />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -62,23 +60,23 @@
 
         <ImageButton
             android:id="@+id/button_previous"
+            android:src="@android:drawable/ic_media_previous"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@android:drawable/ic_media_previous"
             />
 
         <ImageButton
             android:id="@+id/button_play_plause"
+            android:src="@android:drawable/ic_media_play"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@android:drawable/ic_media_play"
             />
 
         <ImageButton
             android:id="@+id/button_next"
+            android:src="@android:drawable/ic_media_next"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@android:drawable/ic_media_next"
             />
     </LinearLayout>
 
