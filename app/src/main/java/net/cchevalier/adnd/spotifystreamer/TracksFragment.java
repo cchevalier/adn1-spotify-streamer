@@ -31,15 +31,16 @@ import retrofit.RetrofitError;
  */
 public class TracksFragment extends Fragment {
 
-    static final String ARTIST_SELECTED = "artistSelected";
-    static final String TRACKS_FOUND = "tracksFound";
-    static final String POSITION = "position";
+    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
+    private static final String KEY_POSITION = "KEY_POSITION";
 
-    ListView listTrackView;
-    TrackAdapter trackAdapter;
+    private ListView mTrackListView;
 
-    MyArtist artist = null;
-    ArrayList<MyTrack> tracksFound = new ArrayList<>();
+    private TrackAdapter mTrackAdapter;
+
+    private MyArtist mArtist = null;
+    private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
 
     public TracksFragment() {
     }
@@ -54,31 +55,31 @@ public class TracksFragment extends Fragment {
         String artistId = "";
 
         Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-            artist = intent.getParcelableExtra(ARTIST_SELECTED);
-            artistId = artist.id;
+        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+            mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            artistId = mArtist.id;
         }
 
         if (savedInstanceState != null) {
-            tracksFound = savedInstanceState.getParcelableArrayList(TRACKS_FOUND);
+            mTracksFound = savedInstanceState.getParcelableArrayList(KEY_TRACKS_FOUND);
         }
 
-        // Retrieve listTrackView
-        listTrackView = (ListView) rootView.findViewById(R.id.listview_tracks);
+        // Retrieve mTrackListView
+        mTrackListView = (ListView) rootView.findViewById(R.id.listview_tracks);
 
         // Create  / Assign the track Array Adapter
-        trackAdapter = new TrackAdapter(getActivity(), tracksFound);
-        listTrackView.setAdapter(trackAdapter);
+        mTrackAdapter = new TrackAdapter(getActivity(), mTracksFound);
+        mTrackListView.setAdapter(mTrackAdapter);
 
 
         // Event: Click on a track
-        listTrackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mTrackListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 // Stage 1: display toast instead of launching mediaPlayer
 /*
-                MyTrack selectedTrack = trackAdapter.getItem(position);
+                MyTrack selectedTrack = mTrackAdapter.getItem(position);
                 String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
                 Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -87,16 +88,16 @@ public class TracksFragment extends Fragment {
 
                 // Stage 2: launch PlayerActivity
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
-                intent.putExtra(ARTIST_SELECTED, artist);
-                intent.putParcelableArrayListExtra(TRACKS_FOUND, tracksFound);
-                intent.putExtra(POSITION, position);
+                intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
+                intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
+                intent.putExtra(KEY_POSITION, position);
                 startActivity(intent);
 
 
             }
         });
 
-        if (tracksFound.isEmpty()) {
+        if (mTracksFound.isEmpty()) {
             // Launch tracks search as AsyncTask with country = DK (hardcoded)
             SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
             task.execute(artistId, "DK");
@@ -109,7 +110,7 @@ public class TracksFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
 
         // our own data to preserve
-        outState.putParcelableArrayList(TRACKS_FOUND, tracksFound);
+        outState.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
         super.onSaveInstanceState(outState);
     }
 
@@ -121,7 +122,7 @@ public class TracksFragment extends Fragment {
     * */
     public class SearchSpotifyForTopTrack extends AsyncTask<String, Void, ArrayList<MyTrack>> {
 
-        boolean fetchErrorFlag;
+        boolean mFetchErrorFlag;
 
         @Override
         protected ArrayList<MyTrack> doInBackground(String... params) {
@@ -147,7 +148,7 @@ public class TracksFragment extends Fragment {
                 results = service.getArtistTopTrack(artistId, options);
             } catch (RetrofitError e) {
                 e.printStackTrace();
-                fetchErrorFlag = true;
+                mFetchErrorFlag = true;
                 return null;
             }
 
@@ -163,15 +164,15 @@ public class TracksFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            fetchErrorFlag = false;
-            trackAdapter.clear();
+            mFetchErrorFlag = false;
+            mTrackAdapter.clear();
         }
 
         @Override
         protected void onPostExecute(ArrayList<MyTrack> tracks) {
 //            super.onPostExecute(tracks);
 
-            if (fetchErrorFlag){
+            if (mFetchErrorFlag){
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -184,8 +185,8 @@ public class TracksFragment extends Fragment {
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
             } else {
-                tracksFound = tracks;
-                trackAdapter.addAll(tracks);
+                mTracksFound = tracks;
+                mTrackAdapter.addAll(tracks);
             }
         }
     }

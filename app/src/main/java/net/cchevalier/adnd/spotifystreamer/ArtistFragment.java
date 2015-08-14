@@ -36,16 +36,17 @@ import retrofit.RetrofitError;
  */
 public class ArtistFragment extends Fragment {
 
-    static final String SEARCH_FIELD = "searchField";
-    static final String ARTISTS_FOUND = "artistsFound";
-    static final String ARTIST_SELECTED = "artistSelected";
+    private static final String KEY_SEARCH_STRING = "KEY_SEARCH_STRING";
+    private static final String KEY_ARTISTS_FOUND = "KEY_ARTISTS_FOUND";
+    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
-    EditText searchView;
-    ListView listArtistView;
-    ArtistAdapter artistAdapter;
+    private EditText mSearchView;
+    private ListView mListArtistView;
 
-    String searchField;
-    ArrayList<MyArtist> artistsFound;
+    private ArtistAdapter mArtistAdapter;
+
+    private String mSearchString;
+    private ArrayList<MyArtist> mArtistsFound;
 
 
     public ArtistFragment() {
@@ -57,11 +58,11 @@ public class ArtistFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            searchField = savedInstanceState.getString(SEARCH_FIELD);
-            artistsFound = savedInstanceState.getParcelableArrayList(ARTISTS_FOUND);
+            mSearchString = savedInstanceState.getString(KEY_SEARCH_STRING);
+            mArtistsFound = savedInstanceState.getParcelableArrayList(KEY_ARTISTS_FOUND);
         } else {
-            searchField = "";
-            artistsFound = new ArrayList<>();
+            mSearchString = "";
+            mArtistsFound = new ArrayList<>();
         }
     }
 
@@ -71,34 +72,34 @@ public class ArtistFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Retrieves searchView / Set value to searchField (possibly restored)
-        searchView = (EditText) rootView.findViewById(R.id.search_view);
-        searchView.setText(searchField);
+        // Retrieves mSearchView / Set value to mSearchString (possibly restored)
+        mSearchView = (EditText) rootView.findViewById(R.id.search_view);
+        mSearchView.setText(mSearchString);
 
-        // Retrieves listArtistView / Set Adapter + value (possibly restored)
-        listArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
-        artistAdapter = new ArtistAdapter(getActivity(), artistsFound);
-        listArtistView.setAdapter(artistAdapter);
+        // Retrieves mListArtistView / Set Adapter + value (possibly restored)
+        mListArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
+        mArtistAdapter = new ArtistAdapter(getActivity(), mArtistsFound);
+        mListArtistView.setAdapter(mArtistAdapter);
 
 
         // Launching search using setOnEditorActionListener
-        searchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mSearchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
 
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 
-                    searchField = searchView.getText().toString();
+                    mSearchString = mSearchView.getText().toString();
 
                     // Hide the kb
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                             Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                    imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
 
                     // Launch search as AsyncTask
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
-                    task.execute(searchField);
+                    task.execute(mSearchString);
 
                     handled = true;
                 }
@@ -107,16 +108,16 @@ public class ArtistFragment extends Fragment {
         });
 
 
-        // Click handling on item listArtistView
-        listArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Click handling on item mListArtistView
+        mListArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                MyArtist selectedArtist = artistAdapter.getItem(position);
+                MyArtist selectedArtist = mArtistAdapter.getItem(position);
 
                 // Start TracksActivity
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
-                intent.putExtra(ARTIST_SELECTED, selectedArtist);
+                intent.putExtra(KEY_ARTIST_SELECTED, selectedArtist);
                 startActivity(intent);
             }
         });
@@ -129,8 +130,8 @@ public class ArtistFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
 
         // our own data to preserve
-        outState.putString(SEARCH_FIELD, searchField);
-        outState.putParcelableArrayList(ARTISTS_FOUND, artistsFound);
+        outState.putString(KEY_SEARCH_STRING, mSearchString);
+        outState.putParcelableArrayList(KEY_ARTISTS_FOUND, mArtistsFound);
 
         super.onSaveInstanceState(outState);
     }
@@ -144,7 +145,7 @@ public class ArtistFragment extends Fragment {
 * */
     public class SearchSpotifyForArtist extends AsyncTask<String, Void, ArrayList<MyArtist>> {
 
-        boolean fetchErrorFlag;
+        private boolean mFetchErrorFlag;
 
         @Override
         protected ArrayList<MyArtist> doInBackground(String... params) {
@@ -163,7 +164,7 @@ public class ArtistFragment extends Fragment {
                 resultsArtists = service.searchArtists(params[0]);
             } catch (RetrofitError e){
                 e.printStackTrace();
-                fetchErrorFlag = true;
+                mFetchErrorFlag = true;
                 return null;
             }
 
@@ -190,15 +191,15 @@ public class ArtistFragment extends Fragment {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        fetchErrorFlag = false;
-        artistAdapter.clear();
+        mFetchErrorFlag = false;
+        mArtistAdapter.clear();
     }
 
 
     @Override
         protected void onPostExecute(ArrayList<MyArtist> artists) {
 
-            if (fetchErrorFlag){
+            if (mFetchErrorFlag){
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -211,11 +212,9 @@ public class ArtistFragment extends Fragment {
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
             } else {
-                artistsFound = artists;
-                artistAdapter.addAll(artists);
+                mArtistsFound = artists;
+                mArtistAdapter.addAll(artists);
             }
         }
-
-
     }
 }

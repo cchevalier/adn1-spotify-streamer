@@ -22,23 +22,22 @@ import java.util.ArrayList;
  */
 public class PlayerFragment extends Fragment {
 
-    static final String ARTIST_SELECTED = "artistSelected";
-    static final String TRACKS_FOUND = "tracksFound";
-    static final String POSITION = "position";
+    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
+    private static final String KEY_POSITION = "KEY_POSITION";
 
 
-    MyArtist artist = null;
-    ArrayList<MyTrack> tracksFound = null;
-    int position = 0;
+    private MyArtist mArtist = null;
+    private ArrayList<MyTrack> mTracksFound = null;
+    private int mPosition = 0;
 
-    TextView artistView;
-    TextView albumView;
-    ImageView albumImageView;
-    TextView trackView;
-
-    ImageButton previousButton;
-    ImageButton playButton;
-    ImageButton nextButton;
+    private TextView mArtistView;
+    private TextView mAlbumView;
+    private ImageView mAlbumArtView;
+    private TextView mTrackView;
+    private ImageButton mPreviousButton;
+    private ImageButton mPlayButton;
+    private ImageButton mNextButton;
 
     public PlayerFragment() {
     }
@@ -50,45 +49,45 @@ public class PlayerFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
         // Retrieves views
-        artistView = (TextView) rootView.findViewById(R.id.mp_artist);
-        albumView = (TextView) rootView.findViewById(R.id.mp_album);
-        trackView = (TextView) rootView.findViewById(R.id.mp_track);
-        albumImageView = (ImageView) rootView.findViewById(R.id.mp_album_img);
+        mArtistView = (TextView) rootView.findViewById(R.id.mp_artist);
+        mAlbumView = (TextView) rootView.findViewById(R.id.mp_album);
+        mTrackView = (TextView) rootView.findViewById(R.id.mp_track);
+        mAlbumArtView = (ImageView) rootView.findViewById(R.id.mp_album_img);
 
-        previousButton = (ImageButton) rootView.findViewById(R.id.button_previous);
-        nextButton = (ImageButton) rootView.findViewById(R.id.button_next);
+        mPreviousButton = (ImageButton) rootView.findViewById(R.id.button_previous);
+        mNextButton = (ImageButton) rootView.findViewById(R.id.button_next);
 
         // Handles intent
         Intent intent = getActivity().getIntent();
 
-        if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-            artist = intent.getParcelableExtra(ARTIST_SELECTED);
+        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+            mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
         }
 
-        if (intent != null && intent.hasExtra(POSITION)) {
-            position = intent.getIntExtra(POSITION, 0);
+        if (intent != null && intent.hasExtra(KEY_POSITION)) {
+            mPosition = intent.getIntExtra(KEY_POSITION, 0);
         }
 
-        if (intent != null && intent.hasExtra(TRACKS_FOUND)) {
-            tracksFound = intent.getParcelableArrayListExtra(TRACKS_FOUND);
+        if (intent != null && intent.hasExtra(KEY_TRACKS_FOUND)) {
+            mTracksFound = intent.getParcelableArrayListExtra(KEY_TRACKS_FOUND);
         }
         updateTrack();
 
-        previousButton.setOnClickListener(new View.OnClickListener() {
+        mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position > 0) {
-                    position--;
+                if (mPosition > 0) {
+                    mPosition--;
                     updateTrack();
                 }
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
+        mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position < tracksFound.size() - 1) {
-                    position++;
+                if (mPosition < mTracksFound.size() - 1) {
+                    mPosition++;
                     updateTrack();
                 }
             }
@@ -100,31 +99,31 @@ public class PlayerFragment extends Fragment {
 
     private void updateTrack() {
 
-        artistView.setText(artist.name);
+        mArtistView.setText(mArtist.name);
 
-        MyTrack currentTrack = tracksFound.get(position);
+        MyTrack currentTrack = mTracksFound.get(mPosition);
 
-        albumView.setText(currentTrack.album);
-        trackView.setText(currentTrack.name);
+        mAlbumView.setText(currentTrack.album);
+        mTrackView.setText(currentTrack.name);
 
-        if (position == 0) {
-            previousButton.setEnabled(false);
-            previousButton.setClickable(false);
-            previousButton.setVisibility(View.INVISIBLE);
+        if (mPosition == 0) {
+            mPreviousButton.setEnabled(false);
+            mPreviousButton.setClickable(false);
+            mPreviousButton.setVisibility(View.INVISIBLE);
         } else {
-            previousButton.setEnabled(true);
-            previousButton.setClickable(true);
-            previousButton.setVisibility(View.VISIBLE);
+            mPreviousButton.setEnabled(true);
+            mPreviousButton.setClickable(true);
+            mPreviousButton.setVisibility(View.VISIBLE);
         }
 
-        if (position == tracksFound.size() - 1) {
-            nextButton.setEnabled(false);
-            nextButton.setClickable(false);
-            nextButton.setVisibility(View.INVISIBLE);
+        if (mPosition == mTracksFound.size() - 1) {
+            mNextButton.setEnabled(false);
+            mNextButton.setClickable(false);
+            mNextButton.setVisibility(View.INVISIBLE);
         } else {
-            nextButton.setEnabled(true);
-            nextButton.setClickable(true);
-            nextButton.setVisibility(View.VISIBLE);
+            mNextButton.setEnabled(true);
+            mNextButton.setClickable(true);
+            mNextButton.setVisibility(View.VISIBLE);
         }
 
         if (currentTrack.UrlLargeImage != null && currentTrack.UrlLargeImage != "") {
@@ -132,9 +131,9 @@ public class PlayerFragment extends Fragment {
                     .load(currentTrack.UrlLargeImage)
                     .resize(300, 300)
                     .centerCrop()
-                    .into(albumImageView);
+                    .into(mAlbumArtView);
         } else {
-            albumImageView.setImageResource(android.R.drawable.ic_menu_help);
+            mAlbumArtView.setImageResource(android.R.drawable.ic_menu_help);
         }
     }
 }

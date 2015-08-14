@@ -11,6 +11,7 @@ import kaaes.spotify.webapi.android.models.Track;
  * Created by cch on 11/07/2015.
  */
 public class MyTrack implements Parcelable {
+
     public String name;
     public String album;
     public Integer popularity;

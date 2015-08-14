@@ -11,6 +11,7 @@ import kaaes.spotify.webapi.android.models.Artist;
  * Created by cch on 11/07/2015.
  */
 public class MyArtist implements Parcelable {
+    
     public String name;
     public String id;
     public Integer popularity;

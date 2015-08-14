@@ -12,7 +12,7 @@ import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 public class TracksActivity extends AppCompatActivity {
 
-    static final String ARTIST_SELECTED = "artistSelected";
+    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
 
     @Override
@@ -25,8 +25,8 @@ public class TracksActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
 
             Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-                MyArtist artist = intent.getParcelableExtra(ARTIST_SELECTED);
+            if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+                MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
                 actionBar.setSubtitle(artist.name);
             }
         }
