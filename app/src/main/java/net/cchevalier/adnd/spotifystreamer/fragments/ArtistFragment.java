@@ -1,4 +1,4 @@
-package net.cchevalier.adnd.spotifystreamer;
+package net.cchevalier.adnd.spotifystreamer.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.cchevalier.adnd.spotifystreamer.R;
+import net.cchevalier.adnd.spotifystreamer.TracksActivity;
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
