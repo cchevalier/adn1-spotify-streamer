@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
+import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 
@@ -28,6 +30,15 @@ public class TracksActivity extends AppCompatActivity {
             if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
                 MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
                 actionBar.setSubtitle(artist.name);
+
+                Bundle arguments = new Bundle();
+                arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
+                TracksFragment fragment = new TracksFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.tracks_detail_container, fragment)
+                        .commit();
+
             }
         }
     }

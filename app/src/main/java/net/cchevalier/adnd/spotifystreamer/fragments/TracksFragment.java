@@ -42,11 +42,22 @@ public class TracksFragment extends Fragment {
     private TrackAdapter mTrackAdapter;
 
     private MyArtist mArtist = null;
+    String mArtistId = "";
     private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
 
     public TracksFragment() {
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
+            mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
+        }
+        mArtistId = mArtist.id;
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,13 +65,14 @@ public class TracksFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
         // Handling of intent
-        String artistId = "";
 
+/*
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
             mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
-            artistId = mArtist.id;
+            mArtistId = mArtist.id;
         }
+*/
 
         if (savedInstanceState != null) {
             mTracksFound = savedInstanceState.getParcelableArrayList(KEY_TRACKS_FOUND);
@@ -102,7 +114,7 @@ public class TracksFragment extends Fragment {
         if (mTracksFound.isEmpty()) {
             // Launch tracks search as AsyncTask with country = DK (hardcoded)
             SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
-            task.execute(artistId, "DK");
+            task.execute(mArtistId, "DK");
         }
 
         return rootView;
@@ -176,7 +188,7 @@ public class TracksFragment extends Fragment {
 
             if (mFetchErrorFlag){
                 Toast toast = Toast.makeText(getActivity(),
-                        "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
+                        "Error fetching track data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
                 return;

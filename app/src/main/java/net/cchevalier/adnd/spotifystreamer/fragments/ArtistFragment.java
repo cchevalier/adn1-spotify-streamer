@@ -1,7 +1,6 @@
 package net.cchevalier.adnd.spotifystreamer.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.R;
-import net.cchevalier.adnd.spotifystreamer.TracksActivity;
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
@@ -40,7 +38,7 @@ public class ArtistFragment extends Fragment {
 
     private static final String KEY_SEARCH_STRING = "KEY_SEARCH_STRING";
     private static final String KEY_ARTISTS_FOUND = "KEY_ARTISTS_FOUND";
-    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
     private EditText mSearchView;
     private ListView mListArtistView;
@@ -50,6 +48,10 @@ public class ArtistFragment extends Fragment {
     private String mSearchString;
     private ArrayList<MyArtist> mArtistsFound;
 
+    public interface Callbacks {
+
+        public void onItemSelected(MyArtist selectedArtist);
+    }
 
     public ArtistFragment() {
     }
@@ -117,10 +119,14 @@ public class ArtistFragment extends Fragment {
 
                 MyArtist selectedArtist = mArtistAdapter.getItem(position);
 
+                ((Callbacks) getActivity()).onItemSelected(selectedArtist);
+
                 // Start TracksActivity
+/*
                 Intent intent = new Intent(getActivity(), TracksActivity.class);
                 intent.putExtra(KEY_ARTIST_SELECTED, selectedArtist);
                 startActivity(intent);
+*/
             }
         });
 
