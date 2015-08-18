@@ -1,8 +1,9 @@
 package net.cchevalier.adnd.spotifystreamer.fragments;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayerFragment extends Fragment {
+public class PlayerFragment extends DialogFragment {
 
     private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
     private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
@@ -94,8 +95,14 @@ public class PlayerFragment extends Fragment {
             }
         });
 
-
         return rootView;
+    }
+
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        return dialog;
     }
 
     private void updateTrack() {

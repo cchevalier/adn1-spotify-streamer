@@ -50,7 +50,7 @@ public class ArtistFragment extends Fragment {
 
     public interface Callbacks {
 
-        public void onItemSelected(MyArtist selectedArtist);
+        public void onArtistSelected(MyArtist selectedArtist);
     }
 
     public ArtistFragment() {
@@ -119,7 +119,7 @@ public class ArtistFragment extends Fragment {
 
                 MyArtist selectedArtist = mArtistAdapter.getItem(position);
 
-                ((Callbacks) getActivity()).onItemSelected(selectedArtist);
+                ((Callbacks) getActivity()).onArtistSelected(selectedArtist);
 
                 // Start TracksActivity
 /*

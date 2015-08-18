@@ -1,7 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tracks_detail_container"
-    tools:layout="@layout/fragment_tracks"
+
+    android:id="@+id/container_tracks_fragment"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    tools:layout="@layout/fragment_tracks"
     />

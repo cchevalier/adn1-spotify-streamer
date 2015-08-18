@@ -13,6 +13,7 @@ import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 public class MainActivity extends AppCompatActivity implements ArtistFragment.Callbacks {
 
+    public static final String KEY_TABLET = "KEY_TABLET";
     private boolean mTwoPane;
 
     @Override
@@ -20,17 +21,15 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.tracks_detail_container) != null) {
-
+        if (findViewById(R.id.container_tracks_fragment) != null) {
             mTwoPane = true;
-
-            if (savedInstanceState == null) {
 /*
+            if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.tracks_detail_container, new TracksFragment())
                         .commit();
-*/
             }
+*/
         } else {
             mTwoPane = false;
         }
@@ -59,25 +58,30 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
-    public void onItemSelected(MyArtist selectedArtist) {
+    public void onArtistSelected(MyArtist selectedArtist) {
 
         if (mTwoPane) {
             Bundle arguments = new Bundle();
+            arguments.putBoolean(KEY_TABLET, mTwoPane);
             arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
-            TracksFragment fragment = new TracksFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.tracks_detail_container, fragment)
-                    .commit();
 
+            TracksFragment tracksFragment = new TracksFragment();
+            tracksFragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container_tracks_fragment, tracksFragment)
+                    .commit();
         } else {
             // Start TracksActivity
             Intent intent = new Intent(this, TracksActivity.class);
+            intent.putExtra(KEY_TABLET, mTwoPane);
             intent.putExtra(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
             startActivity(intent);
-
         }
-
     }
+
+
+
 }

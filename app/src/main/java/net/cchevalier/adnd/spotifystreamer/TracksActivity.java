@@ -16,30 +16,39 @@ public class TracksActivity extends AppCompatActivity {
 
     private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
+    public static final String KEY_TABLET = "KEY_TABLET";
+    private boolean mTwoPane = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracks);
 
+        String artistName = "";
+
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+
+            MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            artistName = artist.name;
+
+            Bundle arguments = new Bundle();
+            arguments.putBoolean(KEY_TABLET, mTwoPane);
+            arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
+
+            TracksFragment tracksFragment = new TracksFragment();
+            tracksFragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_tracks_fragment, tracksFragment)
+                    .commit();
+        }
+
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-
-            Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
-                MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
-                actionBar.setSubtitle(artist.name);
-
-                Bundle arguments = new Bundle();
-                arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
-                TracksFragment fragment = new TracksFragment();
-                fragment.setArguments(arguments);
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.tracks_detail_container, fragment)
-                        .commit();
-
-            }
+            actionBar.setSubtitle(artistName);
         }
     }
 

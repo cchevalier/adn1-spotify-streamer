@@ -1,28 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     android:divider="?android:attr/dividerHorizontal"
+
     tools:context=".MainActivity"
-    android:orientation="horizontal">
+    >
 
     <!--
     This layout is a two-pane layout for the Items master/detail flow.
     -->
 
     <fragment
-        android:id="@+id/fragment_main"
+        android:id="@+id/container_artist_fragment"
         android:name="net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment"
-        tools:layout="@layout/fragment_main"
+
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2" />
+        android:layout_weight="2"
+
+        tools:layout="@layout/fragment_main"
+        />
 
     <FrameLayout
-        android:id="@+id/tracks_detail_container"
+        android:id="@+id/container_tracks_fragment"
+
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3" />
+        android:layout_weight="3"
+        />
 
 </LinearLayout>

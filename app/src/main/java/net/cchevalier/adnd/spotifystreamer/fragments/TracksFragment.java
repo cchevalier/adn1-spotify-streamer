@@ -1,5 +1,6 @@
 package net.cchevalier.adnd.spotifystreamer.fragments;
 
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,9 +34,10 @@ import retrofit.RetrofitError;
  */
 public class TracksFragment extends Fragment {
 
-    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
-    private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
-    private static final String KEY_POSITION = "KEY_POSITION";
+    public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    public static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
+    public static final String KEY_POSITION = "KEY_POSITION";
+    public static final String KEY_TABLET = "KEY_TABLET";
 
     private ListView mTrackListView;
 
@@ -44,6 +46,14 @@ public class TracksFragment extends Fragment {
     private MyArtist mArtist = null;
     String mArtistId = "";
     private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
+
+    private boolean mTwoPane = false;
+
+    public interface Callbacks {
+
+        public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position);
+    }
+
 
     public TracksFragment() {
     }
@@ -56,6 +66,10 @@ public class TracksFragment extends Fragment {
             mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
         }
         mArtistId = mArtist.id;
+
+        if (getArguments().containsKey(KEY_TABLET)) {
+            mTwoPane = getArguments().getBoolean(KEY_TABLET);
+        }
 
     }
 
@@ -101,12 +115,29 @@ public class TracksFragment extends Fragment {
 */
 
                 // Stage 2: launch PlayerActivity
-                Intent intent = new Intent(getActivity(), PlayerActivity.class);
-                intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
-                intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
-                intent.putExtra(KEY_POSITION, position);
-                startActivity(intent);
+                //onTrackSelected(mArtist, mTracksFound, position);
+                if (mTwoPane) {
+                    Bundle arguments = new Bundle();
+                    arguments.putParcelable(KEY_ARTIST_SELECTED, mArtist);
+                    arguments.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
+                    arguments.putInt(KEY_POSITION, position);
 
+                    PlayerFragment playerFragment = new PlayerFragment();
+                    playerFragment.setArguments(arguments);
+
+
+//                    playerFragment.show(getSupportFragmentManager(), "dialog");
+
+
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                    intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
+                    intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
+                    intent.putExtra(KEY_POSITION, position);
+
+                    startActivity(intent);
+                }
 
             }
         });
@@ -122,11 +153,11 @@ public class TracksFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
         // our own data to preserve
         outState.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
         super.onSaveInstanceState(outState);
     }
+
 
 
 
