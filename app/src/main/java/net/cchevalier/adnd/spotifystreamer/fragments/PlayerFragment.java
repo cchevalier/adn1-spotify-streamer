@@ -62,17 +62,21 @@ public class PlayerFragment extends DialogFragment {
         // Handles intent
         Intent intent = getActivity().getIntent();
 
-        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
-            mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+        if (intent != null) {
+            if (intent.hasExtra(KEY_ARTIST_SELECTED)) {
+                mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            }
+
+            if (intent.hasExtra(KEY_POSITION)) {
+                mPosition = intent.getIntExtra(KEY_POSITION, 0);
+            }
+
+            if (intent.hasExtra(KEY_TRACKS_FOUND)) {
+                mTracksFound = intent.getParcelableArrayListExtra(KEY_TRACKS_FOUND);
+            }
         }
 
-        if (intent != null && intent.hasExtra(KEY_POSITION)) {
-            mPosition = intent.getIntExtra(KEY_POSITION, 0);
-        }
 
-        if (intent != null && intent.hasExtra(KEY_TRACKS_FOUND)) {
-            mTracksFound = intent.getParcelableArrayListExtra(KEY_TRACKS_FOUND);
-        }
         updateTrack();
 
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +102,27 @@ public class PlayerFragment extends DialogFragment {
         return rootView;
     }
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+
+            if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
+                mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
+            }
+
+            if (getArguments().containsKey(KEY_POSITION)) {
+                mPosition = getArguments().getInt(KEY_POSITION);
+            }
+
+            if (getArguments().containsKey(KEY_TRACKS_FOUND)) {
+                mTracksFound = getArguments().getParcelableArrayList(KEY_TRACKS_FOUND);
+            }
+        }
+
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

@@ -8,6 +8,9 @@ by CChevalier, July 2015.
 ## Part 2
 
 #### References
+- Tuts+
+    - [Create a Music Player on Android] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778)
+
 
 
 #### References (french)

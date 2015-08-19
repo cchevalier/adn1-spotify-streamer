@@ -41,7 +41,7 @@ public class TracksActivity extends AppCompatActivity {
             tracksFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_tracks_fragment, tracksFragment)
+                    .add(R.id.container_fragment_tracks, tracksFragment)
                     .commit();
         }
 

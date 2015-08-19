@@ -115,16 +115,10 @@ public class TracksFragment extends Fragment {
 */
 
                 // Stage 2: launch PlayerActivity
-                //onTrackSelected(mArtist, mTracksFound, position);
+
                 if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putParcelable(KEY_ARTIST_SELECTED, mArtist);
-                    arguments.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
-                    arguments.putInt(KEY_POSITION, position);
 
-                    PlayerFragment playerFragment = new PlayerFragment();
-                    playerFragment.setArguments(arguments);
-
+                    ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
 
 //                    playerFragment.show(getSupportFragmentManager(), "dialog");
 

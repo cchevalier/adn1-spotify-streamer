@@ -27,7 +27,7 @@
         />
 
     <FrameLayout
-        android:id="@+id/container_tracks_fragment"
+        android:id="@+id/container_fragment_tracks"
 
         android:layout_width="0dp"
         android:layout_height="match_parent"

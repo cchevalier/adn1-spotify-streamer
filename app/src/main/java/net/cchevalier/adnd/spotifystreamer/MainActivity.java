@@ -7,11 +7,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
+import net.cchevalier.adnd.spotifystreamer.fragments.PlayerFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
+
+import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements ArtistFragment.Callbacks {
+public class MainActivity extends AppCompatActivity implements ArtistFragment.Callbacks, TracksFragment.Callbacks {
 
     public static final String KEY_TABLET = "KEY_TABLET";
     private boolean mTwoPane;
@@ -21,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.container_tracks_fragment) != null) {
+        if (findViewById(R.id.container_fragment_tracks) != null) {
             mTwoPane = true;
 /*
             if (savedInstanceState == null) {
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
             tracksFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_tracks_fragment, tracksFragment)
+                    .replace(R.id.container_fragment_tracks, tracksFragment)
                     .commit();
         } else {
             // Start TracksActivity
@@ -83,5 +87,18 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
     }
 
 
+    @Override
+    public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position) {
 
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(TracksFragment.KEY_ARTIST_SELECTED, selectedArtist);
+        arguments.putParcelableArrayList(TracksFragment.KEY_TRACKS_FOUND, TracksFound);
+        arguments.putInt(TracksFragment.KEY_POSITION, position);
+
+        PlayerFragment playerFragment = new PlayerFragment();
+        playerFragment.setArguments(arguments);
+
+//        FragmentManager fragmentManager = getFragmentManager();
+        playerFragment.show(getFragmentManager(), "dialog");
+    }
 }
