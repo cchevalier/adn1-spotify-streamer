@@ -8,10 +8,15 @@ by CChevalier, July 2015.
 ## Part 2
 
 #### References
+- developer.android.com
+    - [Guide Media Playback: Using a Service with MediaPlayer] (http://developer.android.com/guide/topics/media/mediaplayer.html#mpandservices)
+- Android samples
+    - [UniversalMusicPlayer] (https://github.com/googlesamples/android-UniversalMusicPlayer)
+    - [RandomMusicPlayer] (https://github.com/android/platform_development/tree/master/samples/RandomMusicPlayer)
 - Tuts+
-    - [Create a Music Player on Android] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778)
-
-
+    - [Create a Music Player on Android: Project Setup] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-project-setup--mobile-22764)
+    - [Create a Music Player on Android: Song Playback] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778)
+    - [Create a Music Player on Android: User Controls] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-user-controls--mobile-22787)
 
 #### References (french)
 
