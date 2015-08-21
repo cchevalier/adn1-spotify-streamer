@@ -9,6 +9,7 @@ by CChevalier, July 2015.
 
 #### References
 - developer.android.com
+    - [Guide Media Playback] (http://developer.android.com/guide/topics/media/mediaplayer.html)
     - [Guide Media Playback: Using a Service with MediaPlayer] (http://developer.android.com/guide/topics/media/mediaplayer.html#mpandservices)
 - Android samples
     - [UniversalMusicPlayer] (https://github.com/googlesamples/android-UniversalMusicPlayer)
@@ -22,7 +23,7 @@ by CChevalier, July 2015.
 
 
 #### Discussions groups
-- [Udacity Discussion Forum - ADnd - P2 Spotify ](https://discussions.udacity.com/c/nd801-2015-05-28/p1-spotify-streamer-stage-2)
+- [Udacity Discussion Forum - ADnd - P2 Spotify ](https://discussions.udacity.com/c/nd801-p1-p2-developing-android-apps/p2-specific-questions)
 - [Google+ Udacity's Android Developer Nanodegree] (https://plus.google.com/communities/109766100514206800627)
 
 ---
@@ -79,5 +80,5 @@ As the deadline of July 13th is getting close and I don't want to restart stage 
     - [Intents / Parcelable] (http://tutos-android-france.com/passer-des-donnees-entre-activites/)
 
 #### Discussions groups
-- [Udacity Discussion Forum - ADnd - P1](https://discussions.udacity.com/c/nd801-2015-05-28/p1-spotify-streamer-stage-1)
+- [Udacity Discussion Forum - ADnd - P1](https://discussions.udacity.com/c/nd801-p1-p2-developing-android-apps/p1-specific-questions)
 - [Google+ Udacity's Android Developer Nanodegree] (https://plus.google.com/communities/109766100514206800627)
