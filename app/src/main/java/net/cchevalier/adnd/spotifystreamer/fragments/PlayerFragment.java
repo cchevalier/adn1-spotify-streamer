@@ -3,6 +3,8 @@ package net.cchevalier.adnd.spotifystreamer.fragments;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -78,6 +81,22 @@ public class PlayerFragment extends DialogFragment {
 
 
         updateTrack();
+
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        MyTrack currentTrack = mTracksFound.get(mPosition);
+        try {
+            mediaPlayer.setDataSource(currentTrack.preview_url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.start();
+
 
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
