@@ -8,9 +8,14 @@ by CChevalier, July 2015.
 ## Part 2
 
 #### References
-- developer.android.com
+- Guides on developer.android.com
     - [Guide Media Playback] (http://developer.android.com/guide/topics/media/mediaplayer.html)
     - [Guide Media Playback: Using a Service with MediaPlayer] (http://developer.android.com/guide/topics/media/mediaplayer.html#mpandservices)
+
+    - [Services] (http://developer.android.com/guide/components/services.html)
+    - [Bound Services] (http://developer.android.com/guide/components/bound-services.html)
+    - [Bound Services: Managing the Lifecycle of a Bound Service] (http://developer.android.com/guide/components/bound-services.html#Lifecycle)
+
 - Android samples
     - [UniversalMusicPlayer] (https://github.com/googlesamples/android-UniversalMusicPlayer)
     - [RandomMusicPlayer] (https://github.com/android/platform_development/tree/master/samples/RandomMusicPlayer)
