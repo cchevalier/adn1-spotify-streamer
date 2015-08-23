@@ -8,7 +8,10 @@ by CChevalier, July 2015.
 
 ## Stage 2
 
-## Submission Stage2 - attempt 1:
+## Submission Stage 2 - attempt 1:
+A first attempt to meet the deadline of the June cohort / Spotify Stage 2. The track playback is implemented via a service bound to the player fragment
+but without implementation of status notification for this attempt. The service/player also uses broadcast feature to signal the end of the current track.
+The seekbar is implemented through a runnable/handler using the bound service to access current position of the media player.
 
 
 #### References
@@ -19,16 +22,17 @@ by CChevalier, July 2015.
     - [Services] (http://developer.android.com/guide/components/services.html)
     - [Bound Services] (http://developer.android.com/guide/components/bound-services.html)
     - [Bound Services: Managing the Lifecycle of a Bound Service] (http://developer.android.com/guide/components/bound-services.html#Lifecycle)
-
-- Android samples
-    - [UniversalMusicPlayer] (https://github.com/googlesamples/android-UniversalMusicPlayer)
-    - [RandomMusicPlayer] (https://github.com/android/platform_development/tree/master/samples/RandomMusicPlayer)
 - Tuts+
     - [Create a Music Player on Android: Project Setup] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-project-setup--mobile-22764)
     - [Create a Music Player on Android: Song Playback] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778)
     - [Create a Music Player on Android: User Controls] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-user-controls--mobile-22787)
-
-#### References (french)
+- Stackoverflow
+    - [SeekBar and media player in android] (http://stackoverflow.com/questions/17168215/seekbar-and-media-player-in-android)
+- Java Code Geeks
+    - [Android MediaPlayer Example] (http://examples.javacodegeeks.com/android/android-mediaplayer-example/)
+- Android samples
+    - [UniversalMusicPlayer] (https://github.com/googlesamples/android-UniversalMusicPlayer)
+    - [RandomMusicPlayer] (https://github.com/android/platform_development/tree/master/samples/RandomMusicPlayer)
 
 
 #### Discussions groups
