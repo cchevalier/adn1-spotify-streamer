@@ -2,11 +2,14 @@ package net.cchevalier.adnd.spotifystreamer.fragments;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +52,8 @@ public class PlayerFragment extends DialogFragment {
     private Intent playIntent;
     private boolean mPlayerBound = false;
 
+    private boolean isOnPause = false;
+
 
     private TextView mArtistView;
     private TextView mAlbumView;
@@ -60,6 +65,12 @@ public class PlayerFragment extends DialogFragment {
     private ImageButton mNextButton;
 
     private SeekBar mSeekBar;
+    private int spotifyDuration = 30000;
+    private Handler durationHandler = new Handler();
+
+
+    private final String PLAY_COMPLETED = "PLAY_COMPLETED";
+    private IntentFilter intentFilter;
 
 
     public PlayerFragment() {
@@ -86,6 +97,8 @@ public class PlayerFragment extends DialogFragment {
         mPlayButton = (ImageButton) rootView.findViewById(R.id.button_play_plause);
 
         mSeekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
+        mSeekBar.setMax(spotifyDuration);
+        mSeekBar.setClickable(false);
 
         // Handles intent
         Intent intent = getActivity().getIntent();
@@ -133,12 +146,38 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (mPlayerService.isPlaying()) {
-                    mPlayerService.pauseMediaPlayer();
+                    mPlayerService.pause();
+                    isOnPause = true;
                     mPlayButton.setImageResource(android.R.drawable.ic_media_play);
                 } else {
-                    playTrack();
+                    if (isOnPause) {
+                        mPlayerService.play();
+                    } else {
+                        playTrack();
+                    }
+                    isOnPause = false;
                     mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
                 }
+
+            }
+        });
+
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mPlayerService.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
         });
@@ -215,6 +254,25 @@ public class PlayerFragment extends DialogFragment {
 
 
     @Override
+    public void onResume() {
+        Log.d(TAG, "onResume ");
+        super.onResume();
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(PLAY_COMPLETED);
+        getActivity().registerReceiver(intentReceiver, intentFilter);
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(intentReceiver);
+    }
+
+
+    @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy ");
         getActivity().unbindService(playerConnection);
@@ -230,6 +288,17 @@ public class PlayerFragment extends DialogFragment {
         mPlayerService.setTrackNumber(mPosition);
         mPlayerService.playTrack();
         mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mPlayerService != null) {
+                    int currentPosition = mPlayerService.getCurrentPosition();
+                    mSeekBar.setProgress(currentPosition);
+                    durationHandler.postDelayed(this, 1000);
+                }
+            }
+        });
     }
 
 
@@ -274,5 +343,19 @@ public class PlayerFragment extends DialogFragment {
     }
 
 
+    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT ).show();
+            mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+
+            if (mPosition < mTracksFound.size() - 1) {
+                mPosition++;
+                updateTrackDisplay();
+                playTrack();
+            }
+
+        }
+    };
 
 }

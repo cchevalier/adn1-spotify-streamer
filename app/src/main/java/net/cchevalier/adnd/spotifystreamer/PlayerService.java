@@ -25,6 +25,8 @@ public class PlayerService extends Service implements
 
     private final String TAG = "PLAY_SERV";
 
+    private final String PLAY_COMPLETED = "PLAY_COMPLETED";
+
     private MediaPlayer mMediaPlayer = null;
 
     private final IBinder mPlayerBind = new PlayerBinder();
@@ -107,6 +109,11 @@ public class PlayerService extends Service implements
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "onCompletion ");
+
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(PLAY_COMPLETED);
+        getBaseContext().sendBroadcast(broadcastIntent);
+
     }
 
 
@@ -139,8 +146,17 @@ public class PlayerService extends Service implements
     }
 
 
-    public void pauseMediaPlayer() {
+    public void pause() {
         mMediaPlayer.pause();
+    }
+
+
+    public void play() {
+        mMediaPlayer.start();
+    }
+
+    public void seekTo(int position) {
+        mMediaPlayer.seekTo(position);
     }
 
 
