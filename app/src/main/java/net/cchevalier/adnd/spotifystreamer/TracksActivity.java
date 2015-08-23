@@ -7,12 +7,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
+import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 
 public class TracksActivity extends AppCompatActivity {
 
-    static final String ARTIST_SELECTED = "artistSelected";
+    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+
+    public static final String KEY_TABLET = "KEY_TABLET";
+    private boolean mTwoPane = false;
 
 
     @Override
@@ -20,15 +25,30 @@ public class TracksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracks);
 
+        String artistName = "";
+
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+
+            MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            artistName = artist.name;
+
+            Bundle arguments = new Bundle();
+            arguments.putBoolean(KEY_TABLET, mTwoPane);
+            arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
+
+            TracksFragment tracksFragment = new TracksFragment();
+            tracksFragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_fragment_tracks, tracksFragment)
+                    .commit();
+        }
+
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-
-            Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(ARTIST_SELECTED)) {
-                MyArtist artist = intent.getParcelableExtra(ARTIST_SELECTED);
-                actionBar.setSubtitle(artist.name);
-            }
+            actionBar.setSubtitle(artistName);
         }
     }
 

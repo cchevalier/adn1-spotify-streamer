@@ -12,21 +12,24 @@
     <TextView
         android:text="@string/search_header"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        />
 
     <EditText
         android:id="@+id/search_view"
-        android:inputType="text"
-        android:imeOptions="actionSearch"
-        android:lines="1"
         android:hint="@string/artist_name"
+        android:inputType="text"
+        android:lines="1"
+        android:imeOptions="actionSearch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        />
 
     <ListView
         android:id="@+id/listview_artist"
+        tools:listitem="@layout/list_item_artist"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"> </ListView>
-
+        android:layout_height="match_parent"
+        />
 
 </LinearLayout>

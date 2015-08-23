@@ -11,17 +11,20 @@ import kaaes.spotify.webapi.android.models.Track;
  * Created by cch on 11/07/2015.
  */
 public class MyTrack implements Parcelable {
+
     public String name;
     public String album;
     public Integer popularity;
     public String UrlLargeImage = null;
     public String UrlMediumImage = null;
+    public String preview_url = null;
 
     // Constructor based on Spotify Track
     public MyTrack(Track track) {
         this.name = track.name;
         this.album = track.album.name;
         this.popularity = track.popularity;
+        this.preview_url = track.preview_url;
 
         // Picking image with res. closest to (200, 200)px for medium
         // Picking first image for Large
@@ -61,6 +64,7 @@ public class MyTrack implements Parcelable {
         this.popularity = in.readInt();
         this.UrlLargeImage = in.readString();
         this.UrlMediumImage = in.readString();
+        this.preview_url = in.readString();
     }
 
     @Override
@@ -76,6 +80,7 @@ public class MyTrack implements Parcelable {
         dest.writeInt(this.popularity);
         dest.writeString(this.UrlLargeImage);
         dest.writeString(this.UrlMediumImage);
+        dest.writeString(this.preview_url);
     }
 
     public static final Parcelable.Creator<MyTrack> CREATOR = new Parcelable.Creator<MyTrack>() {
