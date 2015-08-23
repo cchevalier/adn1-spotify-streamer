@@ -4,8 +4,12 @@ ADnd-P1-SpotifyStreamer : A music streaming application.
 
 by CChevalier, July 2015.
 
+---
 
-## Part 2
+## Stage 2
+
+## Submission Stage2 - attempt 1:
+
 
 #### References
 - Guides on developer.android.com
@@ -33,9 +37,9 @@ by CChevalier, July 2015.
 
 ---
 
-## Part 1
+## Stage 1
 
-## Update for submission 1.1:
+## Update for submission stage 1 - attempt 2:
 Thanks to the reviewer for a fast and very valuable review of my first submission.
 
 First submission failed for mainly two reasons:  
@@ -51,7 +55,7 @@ Just a final remark:
 While retrieving data from savedInstanceState I do not check if the requested data type is there (I take for granted that since my app put it there then there it is...) I guess a more robust approach would be to try/catch all these get calls. I will need to investigate this more in the future but reviewer insights is welcome.  
 
 
-## Original message for submission 1.0:    
+## Original message for submission stage 1 - attempt 1:
 As the deadline of July 13th is getting close and I don't want to restart stage 1 with the Movies App, I add to make some choices to finalize a first version for submission, see below:
 
 ### Known issues or Personal Choices

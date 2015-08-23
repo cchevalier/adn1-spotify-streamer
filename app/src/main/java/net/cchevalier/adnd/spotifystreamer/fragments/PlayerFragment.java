@@ -8,11 +8,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -29,6 +32,8 @@ import java.util.ArrayList;
  * A placeholder fragment containing a simple view.
  */
 public class PlayerFragment extends DialogFragment {
+    
+    private final String TAG = "PLAY_FRAG";
 
     private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
     private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
@@ -54,13 +59,17 @@ public class PlayerFragment extends DialogFragment {
     private ImageButton mPlayButton;
     private ImageButton mNextButton;
 
+    private SeekBar mSeekBar;
+
+
     public PlayerFragment() {
+        Log.d(TAG, "PlayerFragment ");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreateView ");
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 /*
         setRetainInstance(true);
@@ -75,6 +84,8 @@ public class PlayerFragment extends DialogFragment {
         mPreviousButton = (ImageButton) rootView.findViewById(R.id.button_previous);
         mNextButton = (ImageButton) rootView.findViewById(R.id.button_next);
         mPlayButton = (ImageButton) rootView.findViewById(R.id.button_play_plause);
+
+        mSeekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
 
         // Handles intent
         Intent intent = getActivity().getIntent();
@@ -93,25 +104,7 @@ public class PlayerFragment extends DialogFragment {
             }
         }
 
-
-        updateTrack();
-
-/*
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        MyTrack currentTrack = mTracksFound.get(mPosition);
-        try {
-            mediaPlayer.setDataSource(currentTrack.preview_url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.start();
-*/
+        updateTrackDisplay();
 
 
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +112,7 @@ public class PlayerFragment extends DialogFragment {
             public void onClick(View v) {
                 if (mPosition > 0) {
                     mPosition--;
-                    updateTrack();
+                    updateTrackDisplay();
                     playTrack();
                 }
             }
@@ -130,7 +123,7 @@ public class PlayerFragment extends DialogFragment {
             public void onClick(View v) {
                 if (mPosition < mTracksFound.size() - 1) {
                     mPosition++;
-                    updateTrack();
+                    updateTrackDisplay();
                     playTrack();
                 }
             }
@@ -139,7 +132,14 @@ public class PlayerFragment extends DialogFragment {
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playTrack();
+                if (mPlayerService.isPlaying()) {
+                    mPlayerService.pauseMediaPlayer();
+                    mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+                } else {
+                    playTrack();
+                    mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+                }
+
             }
         });
 
@@ -147,14 +147,9 @@ public class PlayerFragment extends DialogFragment {
     }
 
 
-    private void playTrack() {
-        mPlayerService.setTrack(mPosition);
-        mPlayerService.playTrack();
-    }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -171,6 +166,9 @@ public class PlayerFragment extends DialogFragment {
                 mTracksFound = getArguments().getParcelableArrayList(KEY_TRACKS_FOUND);
             }
         }
+
+
+
     }
 
     // Connect to the PlayerService
@@ -178,15 +176,18 @@ public class PlayerFragment extends DialogFragment {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected ");
             PlayerBinder binder = (PlayerBinder)service;
             mPlayerService = binder.getService();
-            mPlayerService.setTracksList(mTracksFound);
-            mPlayerService.setTrack(mPosition);
+            mPlayerService.setTracks(mTracksFound);
+            mPlayerService.setTrackNumber(mPosition);
             mPlayerBound = true;
+            playTrack();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected ");
             mPlayerBound = false;
         }
     };
@@ -194,31 +195,46 @@ public class PlayerFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateDialog ");
         Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         return dialog;
     }
 
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart ");
         super.onStart();
         if (playIntent == null) {
             playIntent = new Intent(getActivity(), PlayerService.class);
             getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
+            //getActivity().startService(playIntent);
         }
     }
 
 
     @Override
-    public void onDestroyView() {
-        mPlayerService.stopService(playIntent);
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy ");
+        getActivity().unbindService(playerConnection);
+        getActivity().stopService(playIntent);
         mPlayerService = null;
         super.onDestroyView();
     }
 
-    private void updateTrack() {
 
+
+    private void playTrack() {
+        Log.d(TAG, "playTrack ");
+        mPlayerService.setTrackNumber(mPosition);
+        mPlayerService.playTrack();
+        mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+    }
+
+
+    private void updateTrackDisplay() {
+        Log.d(TAG, "updateTrackDisplay ");
         mArtistView.setText(mArtist.name);
 
         MyTrack currentTrack = mTracksFound.get(mPosition);

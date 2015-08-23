@@ -23,31 +23,52 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
+    private final String TAG = "PLAY_SERV";
 
     private MediaPlayer mMediaPlayer = null;
+
     private final IBinder mPlayerBind = new PlayerBinder();
 
+    // Tracks settings
     private ArrayList<MyTrack> mTracks = null;
-    private int mPosition = -1;
+    private int trackNumber = -1;
+
+
+    /*
+    * PlayerBinder
+    * */
+    public class PlayerBinder extends Binder {
+
+        public PlayerService getService() {
+            Log.d(TAG, "getService ");
+            return PlayerService.this;
+        }
+    }
 
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind ");
         return mPlayerBind;
     }
 
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind ");
         mMediaPlayer.stop();
         mMediaPlayer.release();
         return false;
     }
 
 
+    /*
+    *
+    * */
     @Override
     public void onCreate() {
+        Log.d(TAG, "onCreate ");
         super.onCreate();
 
         mMediaPlayer = new MediaPlayer();
@@ -55,7 +76,44 @@ public class PlayerService extends Service implements
     }
 
 
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy ");
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+
+    /*
+    * Required MediaPlayer Listeners
+    * */
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        Log.d(TAG, "onPrepared ");
+        mp.start();
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.d(TAG, "onError ");
+        mp.reset();
+        return false;
+    }
+
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        Log.d(TAG, "onCompletion ");
+    }
+
+
+
+
     public void initMusicPlayer() {
+        Log.d(TAG, "initMusicPlayer ");
         mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -65,14 +123,10 @@ public class PlayerService extends Service implements
     }
 
 
-    public void setTracksList(ArrayList<MyTrack> theTracks) {
-        mTracks = theTracks;
-    }
-
-
     public void playTrack() {
+        Log.d(TAG, "playTrack ");
 
-        MyTrack currentTrack = mTracks.get(mPosition);
+        MyTrack currentTrack = mTracks.get(trackNumber);
 
         mMediaPlayer.reset();
         try {
@@ -85,32 +139,40 @@ public class PlayerService extends Service implements
     }
 
 
-    public void setTrack(int position) {
-        mPosition = position;
+    public void pauseMediaPlayer() {
+        mMediaPlayer.pause();
     }
 
 
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        mp.start();
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        return false;
+    /*
+    * get / set Methods
+    * */
+    public boolean isPlaying() {
+        return mMediaPlayer.isPlaying();
     }
 
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-
+    public void setTracks(ArrayList<MyTrack> theTracks) {
+        mTracks = theTracks;
     }
 
 
-    public class PlayerBinder extends Binder {
-
-        public PlayerService getService() {
-            return PlayerService.this;
-        }
+    public void setTrackNumber(int number) {
+        this.trackNumber = number;
     }
+
+    public int getTrackNumber() {
+        return trackNumber;
+    }
+
+
+    public int getCurrentPosition() {
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+
+    public int getDuration() {
+        return mMediaPlayer.getDuration();
+    }
+
 }

@@ -1,0 +1,91 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+
+    tools:context="net.cchevalier.adnd.spotifystreamer.fragments.PlayerFragment"
+    >
+
+    <TextView
+        tools:text="Artist"
+        android:id="@+id/mp_artist"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        />
+
+    <TextView
+        tools:text="Album"
+        android:id="@+id/mp_album"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        />
+
+    <ImageView
+        android:id="@+id/mp_album_img"
+        android:src="@android:drawable/ic_menu_help"
+        tools:background="#F09664"
+
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:padding="5dp"
+        android:layout_gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/mp_track"
+        tools:text="Track"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/button_previous"
+            android:src="@android:drawable/ic_media_previous"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            />
+
+        <ImageButton
+            android:id="@+id/button_play_plause"
+            android:src="@android:drawable/ic_media_play"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            />
+
+        <ImageButton
+            android:id="@+id/button_next"
+            android:src="@android:drawable/ic_media_next"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            />
+    </LinearLayout>
+
+</LinearLayout>
