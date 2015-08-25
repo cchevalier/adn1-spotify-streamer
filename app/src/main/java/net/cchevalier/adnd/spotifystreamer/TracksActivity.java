@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,6 +15,8 @@ import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 
 public class TracksActivity extends AppCompatActivity {
 
+    private final String TAG = "TRACKS_ACT";
+
     private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
     public static final String KEY_TABLET = "KEY_TABLET";
@@ -22,6 +25,8 @@ public class TracksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracks);
 

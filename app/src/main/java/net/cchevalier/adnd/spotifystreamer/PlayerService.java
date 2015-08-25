@@ -1,5 +1,7 @@
 package net.cchevalier.adnd.spotifystreamer;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -23,13 +25,15 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-    private final String TAG = "PLAY_SERV";
+    private final String TAG = "PLAY_SERVICE";
 
     private final String PLAY_COMPLETED = "PLAY_COMPLETED";
 
     private MediaPlayer mMediaPlayer = null;
 
     private final IBinder mPlayerBind = new PlayerBinder();
+
+    private static final int NOTIFICATION_ID = 1;
 
     // Tracks settings
     private ArrayList<MyTrack> mTracks = null;
@@ -42,15 +46,23 @@ public class PlayerService extends Service implements
     public class PlayerBinder extends Binder {
 
         public PlayerService getService() {
-            Log.d(TAG, "getService ");
+            Log.d(TAG, "PlayerBinder.getService ");
             return PlayerService.this;
         }
     }
 
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+    /*
+        The system calls this method when another component wants to bind with the
+        service by calling bindService(). In your implementation of this method,
+        you must provide an interface that clients use to communicate with the service,
+        by returning an IBinder.
+
+        You must always implement this method, but if you don't want to allow binding,
+        then you should return null.
+    */
         Log.d(TAG, "onBind ");
         return mPlayerBind;
     }
@@ -74,7 +86,38 @@ public class PlayerService extends Service implements
         super.onCreate();
 
         mMediaPlayer = new MediaPlayer();
-        initMusicPlayer();
+        initMediaPlayer();
+
+        // Create a notification area notification so the user
+        // can get back to the MusicServiceClient
+        final Intent notificationIntent = new Intent(getApplicationContext(),
+                MainActivity.class);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+
+        final Notification notification = new Notification.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setOngoing(true).setContentTitle("Music Playing")
+                .setContentText("Click to Access Music Player")
+                .setContentIntent(pendingIntent).build();
+
+        // Put this Service in a foreground state, so it won't
+        // readily be killed by the system
+        startForeground(NOTIFICATION_ID, notification);
+    }
+
+
+    public void initMediaPlayer() {
+        Log.d(TAG, "initMediaPlayer ");
+
+        mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setOnCompletionListener(this);
     }
 
 
@@ -105,7 +148,6 @@ public class PlayerService extends Service implements
         return false;
     }
 
-
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "onCompletion ");
@@ -117,17 +159,6 @@ public class PlayerService extends Service implements
     }
 
 
-
-
-    public void initMusicPlayer() {
-        Log.d(TAG, "initMusicPlayer ");
-        mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        mMediaPlayer.setOnPreparedListener(this);
-        mMediaPlayer.setOnErrorListener(this);
-        mMediaPlayer.setOnCompletionListener(this);
-    }
 
 
     public void playTrack() {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,8 @@ import retrofit.RetrofitError;
  */
 public class TracksFragment extends Fragment {
 
+    private final String TAG = "TRACKS_FRAG";
+
     public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
     public static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
     public static final String KEY_POSITION = "KEY_POSITION";
@@ -56,10 +59,13 @@ public class TracksFragment extends Fragment {
 
 
     public TracksFragment() {
+        Log.d(TAG, "TracksFragment ");
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
@@ -76,6 +82,8 @@ public class TracksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView ");
+
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
         // Handling of intent
@@ -106,33 +114,24 @@ public class TracksFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 // Stage 1: display toast instead of launching mediaPlayer
-/*
-                MyTrack selectedTrack = mTrackAdapter.getItem(position);
-                String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
-                Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                toast.show();
-*/
+//                MyTrack selectedTrack = mTrackAdapter.getItem(position);
+//                String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
+//                Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
+//                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+//                toast.show();
 
                 // Stage 2: launch PlayerActivity
-
                 if (mTwoPane) {
-
                     ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
-
 //                    playerFragment.show(getSupportFragmentManager(), "dialog");
-
-
                 }
                 else {
                     Intent intent = new Intent(getActivity(), PlayerActivity.class);
                     intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
                     intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
                     intent.putExtra(KEY_POSITION, position);
-
                     startActivity(intent);
                 }
-
             }
         });
 
@@ -147,6 +146,7 @@ public class TracksFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState ");
         // our own data to preserve
         outState.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
         super.onSaveInstanceState(outState);

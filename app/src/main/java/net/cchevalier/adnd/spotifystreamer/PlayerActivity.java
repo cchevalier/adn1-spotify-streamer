@@ -1,12 +1,16 @@
 package net.cchevalier.adnd.spotifystreamer;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class PlayerActivity extends AppCompatActivity {
+
+    private final String TAG = "PLAY_ACT";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +27,8 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu ");
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_player, menu);
         return true;
@@ -30,6 +36,8 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected ");
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.

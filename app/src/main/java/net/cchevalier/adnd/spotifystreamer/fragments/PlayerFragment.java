@@ -54,7 +54,7 @@ public class PlayerFragment extends DialogFragment {
 
     private boolean isOnPause = false;
 
-
+    // Local Views
     private TextView mArtistView;
     private TextView mAlbumView;
     private ImageView mAlbumArtView;
@@ -78,13 +78,32 @@ public class PlayerFragment extends DialogFragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
+
+        super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
+
+        if (getArguments() != null) {
+            if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
+                mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
+            }
+            if (getArguments().containsKey(KEY_POSITION)) {
+                mPosition = getArguments().getInt(KEY_POSITION);
+            }
+            if (getArguments().containsKey(KEY_TRACKS_FOUND)) {
+                mTracksFound = getArguments().getParcelableArrayList(KEY_TRACKS_FOUND);
+            }
+        }
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView ");
+
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
-/*
-        setRetainInstance(true);
-*/
 
         // Retrieves views
         mArtistView = (TextView) rootView.findViewById(R.id.mp_artist);
@@ -102,23 +121,19 @@ public class PlayerFragment extends DialogFragment {
 
         // Handles intent
         Intent intent = getActivity().getIntent();
-
         if (intent != null) {
             if (intent.hasExtra(KEY_ARTIST_SELECTED)) {
                 mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
             }
-
             if (intent.hasExtra(KEY_POSITION)) {
                 mPosition = intent.getIntExtra(KEY_POSITION, 0);
             }
-
             if (intent.hasExtra(KEY_TRACKS_FOUND)) {
                 mTracksFound = intent.getParcelableArrayListExtra(KEY_TRACKS_FOUND);
             }
         }
 
         updateTrackDisplay();
-
 
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,7 +173,6 @@ public class PlayerFragment extends DialogFragment {
                     isOnPause = false;
                     mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
                 }
-
             }
         });
 
@@ -173,12 +187,10 @@ public class PlayerFragment extends DialogFragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 
@@ -186,36 +198,17 @@ public class PlayerFragment extends DialogFragment {
     }
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate ");
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-
-            if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
-                mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
-            }
-
-            if (getArguments().containsKey(KEY_POSITION)) {
-                mPosition = getArguments().getInt(KEY_POSITION);
-            }
-
-            if (getArguments().containsKey(KEY_TRACKS_FOUND)) {
-                mTracksFound = getArguments().getParcelableArrayList(KEY_TRACKS_FOUND);
-            }
-        }
 
 
-
-    }
-
-    // Connect to the PlayerService
+    /*
+    *   playerConnection = ServiceConnection to PlayerService
+    * */
     private ServiceConnection playerConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "onServiceConnected ");
+
             PlayerBinder binder = (PlayerBinder)service;
             mPlayerService = binder.getService();
             mPlayerService.setTracks(mTracksFound);
@@ -227,6 +220,7 @@ public class PlayerFragment extends DialogFragment {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "onServiceDisconnected ");
+
             mPlayerBound = false;
         }
     };
@@ -248,7 +242,7 @@ public class PlayerFragment extends DialogFragment {
         if (playIntent == null) {
             playIntent = new Intent(getActivity(), PlayerService.class);
             getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
-            //getActivity().startService(playIntent);
+            getActivity().startService(playIntent);
         }
     }
 
@@ -267,6 +261,8 @@ public class PlayerFragment extends DialogFragment {
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause ");
+
         super.onPause();
         getActivity().unregisterReceiver(intentReceiver);
     }
@@ -275,8 +271,9 @@ public class PlayerFragment extends DialogFragment {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy ");
+
         getActivity().unbindService(playerConnection);
-        getActivity().stopService(playIntent);
+        //getActivity().stopService(playIntent);
         mPlayerService = null;
         super.onDestroyView();
     }
@@ -285,6 +282,7 @@ public class PlayerFragment extends DialogFragment {
 
     private void playTrack() {
         Log.d(TAG, "playTrack ");
+
         mPlayerService.setTrackNumber(mPosition);
         mPlayerService.playTrack();
         mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
@@ -304,6 +302,7 @@ public class PlayerFragment extends DialogFragment {
 
     private void updateTrackDisplay() {
         Log.d(TAG, "updateTrackDisplay ");
+
         mArtistView.setText(mArtist.name);
 
         MyTrack currentTrack = mTracksFound.get(mPosition);
@@ -344,8 +343,11 @@ public class PlayerFragment extends DialogFragment {
 
 
     private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive ");
+
             //Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT ).show();
             mPlayButton.setImageResource(android.R.drawable.ic_media_play);
 
@@ -354,7 +356,6 @@ public class PlayerFragment extends DialogFragment {
                 updateTrackDisplay();
                 playTrack();
             }
-
         }
     };
 

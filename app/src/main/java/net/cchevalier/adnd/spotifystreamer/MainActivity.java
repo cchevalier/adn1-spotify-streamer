@@ -3,6 +3,7 @@ package net.cchevalier.adnd.spotifystreamer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,25 +16,24 @@ import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements ArtistFragment.Callbacks, TracksFragment.Callbacks {
+public class MainActivity extends AppCompatActivity
+        implements ArtistFragment.Callbacks, TracksFragment.Callbacks {
+
+    private final String TAG = "MAIN_ACT";
 
     public static final String KEY_TABLET = "KEY_TABLET";
     private boolean mTwoPane;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.container_fragment_tracks) != null) {
             mTwoPane = true;
-/*
-            if (savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.tracks_detail_container, new TracksFragment())
-                        .commit();
-            }
-*/
         } else {
             mTwoPane = false;
         }
@@ -41,14 +41,64 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
 
 
     @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart ");
+
+        super.onStart();
+    }
+
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume ");
+
+        super.onResume();
+    }
+
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause ");
+
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop ");
+
+        super.onStop();
+    }
+
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onRestart ");
+
+        super.onRestart();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy ");
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu ");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected ");
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -63,8 +113,14 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
     }
 
 
+
+
+
+    /* ArtistFragment.Callbacks */
     @Override
     public void onArtistSelected(MyArtist selectedArtist) {
+        Log.d(TAG, "onArtistSelected ");
+
 
         if (mTwoPane) {
             Bundle arguments = new Bundle();
@@ -87,8 +143,11 @@ public class MainActivity extends AppCompatActivity implements ArtistFragment.Ca
     }
 
 
+
+    /* TracksFragment.Callbacks */
     @Override
     public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position) {
+        Log.d(TAG, "onTrackSelected ");
 
         Bundle arguments = new Bundle();
         arguments.putParcelable(TracksFragment.KEY_ARTIST_SELECTED, selectedArtist);
