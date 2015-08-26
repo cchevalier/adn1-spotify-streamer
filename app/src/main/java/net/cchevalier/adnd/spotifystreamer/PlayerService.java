@@ -11,7 +11,9 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
+import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 
 import java.io.IOException;
@@ -27,6 +29,16 @@ public class PlayerService extends Service implements
 
     private final String TAG = "PLAY_SERVICE";
 
+    // Intents ACTION "net.cchevalier.adnd.spotifystreamer"
+    public final static String ACTION_SHOW = "net.cchevalier.adnd.spotifystreamer.ACTION_SHOW";
+    public final static String ACTION_START = "net.cchevalier.adnd.spotifystreamer.ACTION_START";
+
+    //  Intents EXTRA
+    public final static String EXTRA_ARTIST = "EXTRA_ARTIST";
+    public final static String EXTRA_TRACKS = "EXTRA_TRACKS";
+    public final static String EXTRA_TRACK_NB = "EXTRA_TRACK_NB";
+
+    // Feedback messages
     private final String PLAY_COMPLETED = "PLAY_COMPLETED";
 
     private MediaPlayer mMediaPlayer = null;
@@ -36,8 +48,10 @@ public class PlayerService extends Service implements
     private static final int NOTIFICATION_ID = 1;
 
     // Tracks settings
+    private MyArtist mArtist;
     private ArrayList<MyTrack> mTracks = null;
-    private int trackNumber = -1;
+    private int mTrackNumber = -1;
+    private MyTrack mCurrentTrack;
 
 
     /*
@@ -69,10 +83,15 @@ public class PlayerService extends Service implements
 
 
     @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind ");
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
+//        mMediaPlayer.stop();
+//        mMediaPlayer.release();
         return false;
     }
 
@@ -85,8 +104,11 @@ public class PlayerService extends Service implements
         Log.d(TAG, "onCreate ");
         super.onCreate();
 
-        mMediaPlayer = new MediaPlayer();
-        initMediaPlayer();
+        if (mMediaPlayer == null) {
+            mMediaPlayer = new MediaPlayer();
+            initMediaPlayer();
+        }
+
 
         // Create a notification area notification so the user
         // can get back to the MusicServiceClient
@@ -108,6 +130,24 @@ public class PlayerService extends Service implements
     }
 
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+//        return super.onStartCommand(intent, flags, startId);
+
+        if (intent == null | intent.getAction() == null) {
+            return START_STICKY;
+        }
+
+        if (intent.getAction() == PlayerService.ACTION_START) {
+            mArtist = intent.getParcelableExtra(PlayerService.EXTRA_ARTIST);
+            mTracks = intent.getParcelableArrayListExtra(PlayerService.EXTRA_TRACKS);
+            mTrackNumber = intent.getIntExtra(PlayerService.EXTRA_TRACK_NB, 0);
+            playTrack();
+        }
+
+        return START_STICKY;
+    }
+
     public void initMediaPlayer() {
         Log.d(TAG, "initMediaPlayer ");
 
@@ -128,6 +168,7 @@ public class PlayerService extends Service implements
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
+        Toast.makeText(this, "PlayerService done", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 
@@ -139,6 +180,27 @@ public class PlayerService extends Service implements
     public void onPrepared(MediaPlayer mp) {
         Log.d(TAG, "onPrepared ");
         mp.start();
+
+        Toast.makeText(getApplicationContext(), "Now playing..." + mCurrentTrack.name, Toast.LENGTH_SHORT).show();
+
+        // Create a notification area notification so the user
+        // can get back to the MusicServiceClient
+        final Intent notificationIntent = new Intent(getApplicationContext(),
+                MainActivity.class);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+
+        final Notification notification = new Notification.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setOngoing(true).setContentTitle(mCurrentTrack.name)
+                .setContentText(mArtist.name + " / " + mCurrentTrack.album)
+                .setContentIntent(pendingIntent).build();
+
+        // Put this Service in a foreground state, so it won't
+        // readily be killed by the system
+        startForeground(NOTIFICATION_ID, notification);
+
     }
 
     @Override
@@ -152,9 +214,19 @@ public class PlayerService extends Service implements
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "onCompletion ");
 
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(PLAY_COMPLETED);
-        getBaseContext().sendBroadcast(broadcastIntent);
+        if (mTrackNumber < mTracks.size() - 1) {
+            mTrackNumber++;
+            playTrack();
+        } else {
+            Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
+
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(PLAY_COMPLETED);
+            getBaseContext().sendBroadcast(broadcastIntent);
+
+            stopSelf();
+        }
+
 
     }
 
@@ -164,11 +236,11 @@ public class PlayerService extends Service implements
     public void playTrack() {
         Log.d(TAG, "playTrack ");
 
-        MyTrack currentTrack = mTracks.get(trackNumber);
+        mCurrentTrack = mTracks.get(mTrackNumber);
 
         mMediaPlayer.reset();
         try {
-            mMediaPlayer.setDataSource(currentTrack.preview_url);
+            mMediaPlayer.setDataSource(mCurrentTrack.preview_url);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("PLAYER SERVICE", "Error setting data source", e);
@@ -205,13 +277,24 @@ public class PlayerService extends Service implements
 
 
     public void setTrackNumber(int number) {
-        this.trackNumber = number;
+        this.mTrackNumber = number;
     }
 
     public int getTrackNumber() {
-        return trackNumber;
+        return mTrackNumber;
     }
 
+    public ArrayList<MyTrack> getTracks() {
+        return mTracks;
+    }
+
+    public MyTrack getCurrentTrack() {
+        return mCurrentTrack;
+    }
+
+    public MyArtist getArtist() {
+        return mArtist;
+    }
 
     public int getCurrentPosition() {
         return mMediaPlayer.getCurrentPosition();

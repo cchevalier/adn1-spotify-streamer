@@ -8,7 +8,10 @@ by CChevalier, July 2015.
 
 ## Stage 2
 
-## Submission Stage 2 - attempt 1:
+## Submission Stage 2 - attempt 2
+
+
+## Submission Stage 2 - attempt 1
 A first attempt to meet the deadline of the June cohort / Spotify Stage 2. The track playback is implemented via a service bound to the player fragment
 but without implementation of status notification for this attempt. The service/player also uses broadcast feature to signal the end of the current track.
 The seekbar is implemented through a runnable/handler using the bound service to access current position of the media player.

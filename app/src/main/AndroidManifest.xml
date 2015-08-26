@@ -42,7 +42,10 @@
                 android:value="net.cchevalier.adnd.spotifystreamer.TracksActivity" />
         </activity>
 
-        <service android:name=".PlayerService"></service>
+        <service
+            android:name=".PlayerService"
+            android:exported = "false">
+        </service>
 
     </application>
 

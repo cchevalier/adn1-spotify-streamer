@@ -19,7 +19,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
 
-    public static final String KEY_TABLET = "KEY_TABLET";
+    public static final String KEY_TABLET = "KEY_UI_TABLET";
     private boolean mTwoPane = false;
 
 

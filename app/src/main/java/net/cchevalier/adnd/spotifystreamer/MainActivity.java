@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity
 
     private final String TAG = "MAIN_ACT";
 
-    public static final String KEY_TABLET = "KEY_TABLET";
-    private boolean mTwoPane;
+    public static final String KEY_UI_TABLET = "KEY_UI_TABLET";
+    private boolean mUiTablet;
 
 
     @Override
@@ -33,9 +33,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.container_fragment_tracks) != null) {
-            mTwoPane = true;
+            mUiTablet = true;
         } else {
-            mTwoPane = false;
+            mUiTablet = false;
         }
     }
 
@@ -122,9 +122,9 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onArtistSelected ");
 
 
-        if (mTwoPane) {
+        if (mUiTablet) {
             Bundle arguments = new Bundle();
-            arguments.putBoolean(KEY_TABLET, mTwoPane);
+            arguments.putBoolean(KEY_UI_TABLET, mUiTablet);
             arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
 
             TracksFragment tracksFragment = new TracksFragment();
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Start TracksActivity
             Intent intent = new Intent(this, TracksActivity.class);
-            intent.putExtra(KEY_TABLET, mTwoPane);
+            intent.putExtra(KEY_UI_TABLET, mUiTablet);
             intent.putExtra(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
             startActivity(intent);
         }
@@ -149,15 +149,22 @@ public class MainActivity extends AppCompatActivity
     public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position) {
         Log.d(TAG, "onTrackSelected ");
 
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        playerServiceIntent.setAction(PlayerService.ACTION_START);
+        playerServiceIntent.putExtra(PlayerService.EXTRA_ARTIST, selectedArtist);
+        playerServiceIntent.putParcelableArrayListExtra(PlayerService.EXTRA_TRACKS, TracksFound);
+        playerServiceIntent.putExtra(PlayerService.EXTRA_TRACK_NB, position);
+        startService(playerServiceIntent);
+
+/*
         Bundle arguments = new Bundle();
         arguments.putParcelable(TracksFragment.KEY_ARTIST_SELECTED, selectedArtist);
         arguments.putParcelableArrayList(TracksFragment.KEY_TRACKS_FOUND, TracksFound);
         arguments.putInt(TracksFragment.KEY_POSITION, position);
+        playerFragment.setArguments(arguments);
+*/
 
         PlayerFragment playerFragment = new PlayerFragment();
-        playerFragment.setArguments(arguments);
-
-//        FragmentManager fragmentManager = getFragmentManager();
         playerFragment.show(getFragmentManager(), "dialog");
     }
 }

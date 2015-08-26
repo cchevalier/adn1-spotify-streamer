@@ -1,7 +1,6 @@
 package net.cchevalier.adnd.spotifystreamer.fragments;
 
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import net.cchevalier.adnd.spotifystreamer.PlayerActivity;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.adapters.TrackAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
@@ -40,7 +38,7 @@ public class TracksFragment extends Fragment {
     public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
     public static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
     public static final String KEY_POSITION = "KEY_POSITION";
-    public static final String KEY_TABLET = "KEY_TABLET";
+    public static final String KEY_UI_TABLET = "KEY_UI_TABLET";
 
     private ListView mTrackListView;
 
@@ -50,7 +48,7 @@ public class TracksFragment extends Fragment {
     String mArtistId = "";
     private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
 
-    private boolean mTwoPane = false;
+    private boolean mUiTablet = false;
 
     public interface Callbacks {
 
@@ -73,8 +71,8 @@ public class TracksFragment extends Fragment {
         }
         mArtistId = mArtist.id;
 
-        if (getArguments().containsKey(KEY_TABLET)) {
-            mTwoPane = getArguments().getBoolean(KEY_TABLET);
+        if (getArguments().containsKey(KEY_UI_TABLET)) {
+            mUiTablet = getArguments().getBoolean(KEY_UI_TABLET);
         }
 
     }
@@ -86,9 +84,8 @@ public class TracksFragment extends Fragment {
 
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
-        // Handling of intent
-
 /*
+        // Handling of intent
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
             mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
@@ -113,17 +110,20 @@ public class TracksFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+/*
                 // Stage 1: display toast instead of launching mediaPlayer
-//                MyTrack selectedTrack = mTrackAdapter.getItem(position);
-//                String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
-//                Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
-//                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-//                toast.show();
+                MyTrack selectedTrack = mTrackAdapter.getItem(position);
+                String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
+                Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+*/
 
                 // Stage 2: launch PlayerActivity
-                if (mTwoPane) {
+                ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
+/*
+                if (mUiTablet) {
                     ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
-//                    playerFragment.show(getSupportFragmentManager(), "dialog");
                 }
                 else {
                     Intent intent = new Intent(getActivity(), PlayerActivity.class);
@@ -132,6 +132,7 @@ public class TracksFragment extends Fragment {
                     intent.putExtra(KEY_POSITION, position);
                     startActivity(intent);
                 }
+*/
             }
         });
 

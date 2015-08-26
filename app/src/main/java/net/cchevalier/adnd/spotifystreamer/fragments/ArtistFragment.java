@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -182,14 +181,16 @@ public class ArtistFragment extends Fragment {
             for (int i = 0; i < count; i++) {
                 Artist artist = resultsArtists.artists.items.get(i);
                 artists.add(new MyArtist(artist));
-
+/*
+                // Logging
                 Log.i("SAPI", i + " " + artist.name);
-//                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
-//                Log.i("SAPI", i + "   id: " + artist.id);
-//                Log.i("SAPI", i + "  uri: " + artist.uri);
+                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
+                Log.i("SAPI", i + "   id: " + artist.id);
+                Log.i("SAPI", i + "  uri: " + artist.uri);
                 if (artist.images.size() > 0) {
                     Log.i("SAPI", i + "  url: " + artist.images.get(0).url);
                 }
+*/
             }
 
             return artists;
