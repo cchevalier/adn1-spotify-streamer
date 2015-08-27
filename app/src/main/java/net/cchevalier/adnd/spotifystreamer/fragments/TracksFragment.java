@@ -1,6 +1,7 @@
 package net.cchevalier.adnd.spotifystreamer.fragments;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.cchevalier.adnd.spotifystreamer.PlayerActivity;
+import net.cchevalier.adnd.spotifystreamer.PlayerService;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.adapters.TrackAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
@@ -120,7 +123,24 @@ public class TracksFragment extends Fragment {
 */
 
                 // Stage 2: launch PlayerActivity
-                ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
+                if (mUiTablet) {
+                    ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
+                } else {
+                    Intent playerServiceIntent = new Intent(getActivity(), PlayerService.class);
+                    playerServiceIntent.setAction(PlayerService.ACTION_START);
+                    playerServiceIntent.putExtra(PlayerService.EXTRA_ARTIST, mArtist);
+                    playerServiceIntent.putParcelableArrayListExtra(PlayerService.EXTRA_TRACKS, mTracksFound);
+                    playerServiceIntent.putExtra(PlayerService.EXTRA_TRACK_NB, position);
+                    getActivity().startService(playerServiceIntent);
+
+                    Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                    intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
+                    intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
+                    intent.putExtra(KEY_POSITION, position);
+                    startActivity(intent);
+
+
+                }
 /*
                 if (mUiTablet) {
                     ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
@@ -134,7 +154,7 @@ public class TracksFragment extends Fragment {
                 }
 */
             }
-        });
+            });
 
         if (mTracksFound.isEmpty()) {
             // Launch tracks search as AsyncTask with country = DK (hardcoded)

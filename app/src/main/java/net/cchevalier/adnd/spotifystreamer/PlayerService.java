@@ -110,6 +110,7 @@ public class PlayerService extends Service implements
         }
 
 
+/*
         // Create a notification area notification so the user
         // can get back to the MusicServiceClient
         final Intent notificationIntent = new Intent(getApplicationContext(),
@@ -127,6 +128,7 @@ public class PlayerService extends Service implements
         // Put this Service in a foreground state, so it won't
         // readily be killed by the system
         startForeground(NOTIFICATION_ID, notification);
+*/
     }
 
 
