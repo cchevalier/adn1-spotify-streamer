@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- -->
-    <string name="title_activity_settings">Spotify Streamer</string>
+    <string name="title_activity_settings">Settings</string>
 
     <string name="pref_controls_key" translatable="false">pref_control</string>
     <string name="pref_controls_title">Controls on notification</string>
@@ -41,5 +41,7 @@
 
     <string name="country_usa">USA</string>
     <string name="country_usa_code" translatable="false">"US"</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>
