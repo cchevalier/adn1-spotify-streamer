@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="country_name">
+        <item>@string/country_denmark</item>
+        <item>@string/country_france</item>
+        <item>@string/country_italy</item>
+        <item>@string/country_uk</item>
+        <item>@string/country_usa</item>
+    </string-array>
+
+    <string-array name="country_code">
+        <item>@string/country_denmark_code</item>
+        <item>@string/country_france_code</item>
+        <item>@string/country_italy_code</item>
+        <item>@string/country_uk_code</item>
+        <item>@string/country_usa_code</item>
+    </string-array>
+
+</resources>

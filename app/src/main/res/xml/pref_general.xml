@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ListPreference
+        android:key="@string/pref_country_key"
+        android:title="@string/pref_country_title"
+        android:summary="@string/pref_country_summary"
+        android:entries="@array/country_name"
+        android:entryValues="@array/country_code"
+        android:defaultValue="@string/country_denmark_code"
+        >
+    </ListPreference>
+
+    <CheckBoxPreference
+        android:key="@string/pref_controls_key"
+        android:title="@string/pref_controls_title"
+        android:summary="@string/pref_controls_summary"
+        android:defaultValue="true"
+        >
+    </CheckBoxPreference>
+
+
+</PreferenceScreen>

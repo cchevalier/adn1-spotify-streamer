@@ -2,8 +2,10 @@ package net.cchevalier.adnd.spotifystreamer.fragments;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -140,9 +142,17 @@ public class TracksFragment extends Fragment {
             });
 
         if (mTracksFound.isEmpty()) {
-            // Launch tracks search as AsyncTask with country = DK (hardcoded)
+
+            // Retrieve country defined by user (DK is default)
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String country_code = prefs.getString(getString(R.string.pref_country_key), "DK");
+            Log.d(TAG, "onCreateView / country = " + country_code);
+
+            // Launch tracks search as AsyncTask with country from Preferences
             SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
-            task.execute(mArtistId, "DK");
+
+
+            task.execute(mArtistId, country_code);
         }
 
         return rootView;

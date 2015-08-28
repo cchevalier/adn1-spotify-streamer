@@ -1,7 +1,9 @@
 package net.cchevalier.adnd.spotifystreamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -27,9 +29,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate ");
+        Log.d(TAG, "onCreate HERE WE GO!!!");
 
         super.onCreate(savedInstanceState);
+
+        // Settings default values for Preferences at first launch
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String country_code = prefs.getString(getString(R.string.pref_country_key), "unknown");
+        Log.d(TAG, "onCreateView / country = " + country_code);
+
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.container_fragment_tracks) != null) {
@@ -106,6 +115,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
