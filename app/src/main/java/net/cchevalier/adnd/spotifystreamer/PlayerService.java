@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,17 +30,12 @@ public class PlayerService extends Service implements
 
     private final String TAG = "PLAY_SERVICE";
 
-    // Intents ACTION "net.cchevalier.adnd.spotifystreamer"
-    public final static String ACTION_SHOW = "net.cchevalier.adnd.spotifystreamer.ACTION_SHOW";
-    public final static String ACTION_START = "net.cchevalier.adnd.spotifystreamer.ACTION_START";
+    // Tracks settings
+    private MyArtist mArtist;
+    private ArrayList<MyTrack> mTracks = null;
+    private int mTrackNumber = -1;
+    private MyTrack mCurrentTrack;
 
-    //  Intents EXTRA
-    public final static String EXTRA_ARTIST = "EXTRA_ARTIST";
-    public final static String EXTRA_TRACKS = "EXTRA_TRACKS";
-    public final static String EXTRA_TRACK_NB = "EXTRA_TRACK_NB";
-
-    // Feedback messages
-    private final String PLAY_COMPLETED = "PLAY_COMPLETED";
 
     private MediaPlayer mMediaPlayer = null;
 
@@ -47,11 +43,6 @@ public class PlayerService extends Service implements
 
     private static final int NOTIFICATION_ID = 1;
 
-    // Tracks settings
-    private MyArtist mArtist;
-    private ArrayList<MyTrack> mTracks = null;
-    private int mTrackNumber = -1;
-    private MyTrack mCurrentTrack;
 
 
     /*
@@ -96,9 +87,6 @@ public class PlayerService extends Service implements
     }
 
 
-    /*
-    *
-    * */
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate ");
@@ -140,10 +128,10 @@ public class PlayerService extends Service implements
             return START_STICKY;
         }
 
-        if (intent.getAction() == PlayerService.ACTION_START) {
-            mArtist = intent.getParcelableExtra(PlayerService.EXTRA_ARTIST);
-            mTracks = intent.getParcelableArrayListExtra(PlayerService.EXTRA_TRACKS);
-            mTrackNumber = intent.getIntExtra(PlayerService.EXTRA_TRACK_NB, 0);
+        if (intent.getAction() == Constants.ACTION_START) {
+            mArtist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
+            mTracks = intent.getParcelableArrayListExtra(Constants.EXTRA_TRACKS);
+            mTrackNumber = intent.getIntExtra(Constants.EXTRA_TRACK_NB, 0);
             playTrack();
         }
 
@@ -188,7 +176,7 @@ public class PlayerService extends Service implements
         // Create a notification area notification so the user
         // can get back to the MusicServiceClient
         final Intent notificationIntent = new Intent(getApplicationContext(),
-                MainActivity.class);
+                PlayerActivity.class);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, 0);
 
@@ -223,7 +211,7 @@ public class PlayerService extends Service implements
             Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
 
             Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(PLAY_COMPLETED);
+            broadcastIntent.setAction(Constants.PLAY_COMPLETED);
             getBaseContext().sendBroadcast(broadcastIntent);
 
             stopSelf();
@@ -233,30 +221,42 @@ public class PlayerService extends Service implements
     }
 
 
-
-
     public void playTrack() {
         Log.d(TAG, "playTrack ");
 
         mCurrentTrack = mTracks.get(mTrackNumber);
-
         mMediaPlayer.reset();
+
         try {
             mMediaPlayer.setDataSource(mCurrentTrack.preview_url);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("PLAYER SERVICE", "Error setting data source", e);
         }
+
         mMediaPlayer.prepareAsync();
     }
 
+    public void playNext(){
+        if (mTrackNumber < mTracks.size() - 1){
+            mTrackNumber++;
+            playTrack();
+        }
+    }
+
+    public void playPrevious(){
+        if (mTrackNumber > 1){
+            mTrackNumber--;
+            playTrack();
+        }
+    }
 
     public void pause() {
         mMediaPlayer.pause();
     }
 
 
-    public void play() {
+    public void resumePlay() {
         mMediaPlayer.start();
     }
 
@@ -264,19 +264,13 @@ public class PlayerService extends Service implements
         mMediaPlayer.seekTo(position);
     }
 
-
-    /*
-    * get / set Methods
-    * */
     public boolean isPlaying() {
         return mMediaPlayer.isPlaying();
     }
 
-
     public void setTracks(ArrayList<MyTrack> theTracks) {
         mTracks = theTracks;
     }
-
 
     public void setTrackNumber(int number) {
         this.mTrackNumber = number;
@@ -301,7 +295,6 @@ public class PlayerService extends Service implements
     public int getCurrentPosition() {
         return mMediaPlayer.getCurrentPosition();
     }
-
 
     public int getDuration() {
         return mMediaPlayer.getDuration();

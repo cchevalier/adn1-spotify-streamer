@@ -12,6 +12,7 @@ import net.cchevalier.adnd.spotifystreamer.fragments.PlayerFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,6 @@ public class MainActivity extends AppCompatActivity
 
     private final String TAG = "MAIN_ACT";
 
-    public static final String KEY_UI_TABLET = "KEY_UI_TABLET";
     private boolean mUiTablet;
 
 
@@ -124,8 +124,8 @@ public class MainActivity extends AppCompatActivity
 
         if (mUiTablet) {
             Bundle arguments = new Bundle();
-            arguments.putBoolean(KEY_UI_TABLET, mUiTablet);
-            arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
+            arguments.putBoolean(Constants.KEY_TABLET, mUiTablet);
+            arguments.putParcelable(Constants.EXTRA_ARTIST, selectedArtist);
 
             TracksFragment tracksFragment = new TracksFragment();
             tracksFragment.setArguments(arguments);
@@ -136,8 +136,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Start TracksActivity
             Intent intent = new Intent(this, TracksActivity.class);
-            intent.putExtra(KEY_UI_TABLET, mUiTablet);
-            intent.putExtra(ArtistFragment.KEY_ARTIST_SELECTED, selectedArtist);
+            intent.putExtra(Constants.KEY_TABLET, mUiTablet);
+            intent.putExtra(Constants.EXTRA_ARTIST, selectedArtist);
             startActivity(intent);
         }
     }
@@ -150,10 +150,10 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onTrackSelected ");
 
         Intent playerServiceIntent = new Intent(this, PlayerService.class);
-        playerServiceIntent.setAction(PlayerService.ACTION_START);
-        playerServiceIntent.putExtra(PlayerService.EXTRA_ARTIST, selectedArtist);
-        playerServiceIntent.putParcelableArrayListExtra(PlayerService.EXTRA_TRACKS, TracksFound);
-        playerServiceIntent.putExtra(PlayerService.EXTRA_TRACK_NB, position);
+        playerServiceIntent.setAction(Constants.ACTION_START);
+        playerServiceIntent.putExtra(Constants.EXTRA_ARTIST, selectedArtist);
+        playerServiceIntent.putParcelableArrayListExtra(Constants.EXTRA_TRACKS, TracksFound);
+        playerServiceIntent.putExtra(Constants.EXTRA_TRACK_NB, position);
         startService(playerServiceIntent);
 
 /*

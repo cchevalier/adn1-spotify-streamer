@@ -8,18 +8,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 
 public class TracksActivity extends AppCompatActivity {
 
     private final String TAG = "TRACKS_ACT";
 
-    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
-
-    public static final String KEY_TABLET = "KEY_UI_TABLET";
     private boolean mTwoPane = false;
 
 
@@ -33,14 +30,14 @@ public class TracksActivity extends AppCompatActivity {
         String artistName = "";
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+        if (intent != null && intent.hasExtra(Constants.EXTRA_ARTIST)) {
 
-            MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            MyArtist artist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
             artistName = artist.name;
 
             Bundle arguments = new Bundle();
-            arguments.putBoolean(KEY_TABLET, mTwoPane);
-            arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
+            arguments.putBoolean(Constants.KEY_TABLET, mTwoPane);
+            arguments.putParcelable(Constants.EXTRA_ARTIST, artist);
 
             TracksFragment tracksFragment = new TracksFragment();
             tracksFragment.setArguments(arguments);

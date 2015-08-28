@@ -29,6 +29,7 @@ import net.cchevalier.adnd.spotifystreamer.PlayerService.PlayerBinder;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -38,11 +39,6 @@ import java.util.ArrayList;
 public class PlayerFragment extends DialogFragment {
     
     private final String TAG = "PLAY_FRAG";
-
-    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
-    private static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
-    private static final String KEY_POSITION = "KEY_POSITION";
-
 
     private MyArtist mArtist = null;
     private ArrayList<MyTrack> mTracks = null;
@@ -67,16 +63,17 @@ public class PlayerFragment extends DialogFragment {
     private ImageButton mNextButton;
 
     private SeekBar mSeekBar;
+
     private int spotifyDuration = 30000;
     private Handler durationHandler = new Handler();
 
-
-    private final String PLAY_COMPLETED = "PLAY_COMPLETED";
     private IntentFilter intentFilter;
 
+
     /*
-*   playerConnection = ServiceConnection to PlayerService
-* */
+    playerConnection = ServiceConnection to PlayerService
+    */
+
     private ServiceConnection playerConnection = new ServiceConnection() {
 
         @Override
@@ -87,13 +84,6 @@ public class PlayerFragment extends DialogFragment {
             mPlayerService = binder.getService();
             mPlayerBound = true;
 
-/*
-            if (!mPlayerService.isPlaying()) {
-                mPlayerService.setTracks(mTracks);
-                mPlayerService.setTrackNumber(mTrackNumber);
-                playTrack();
-            }
-*/
             updateTrackDisplay();
 
             getActivity().runOnUiThread(new Runnable() {
@@ -184,8 +174,6 @@ public class PlayerFragment extends DialogFragment {
         }
 */
 
-
-
         return rootView;
     }
 
@@ -208,9 +196,9 @@ public class PlayerFragment extends DialogFragment {
         Log.d(TAG, "onStart ");
         super.onStart();
 
-            playIntent = new Intent(getActivity(), PlayerService.class);
-        playIntent.setAction(PlayerService.ACTION_SHOW);
-            getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
+        playIntent = new Intent(getActivity(), PlayerService.class);
+        playIntent.setAction(Constants.ACTION_SHOW);
+        getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
     }
 
 
@@ -219,26 +207,17 @@ public class PlayerFragment extends DialogFragment {
         Log.d(TAG, "onResume ");
         super.onResume();
 
-
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTrackNumber > 0) {
-                    mTrackNumber--;
-                    updateTrackDisplay();
-                    playTrack();
-                }
+                mPlayerService.playPrevious();
             }
         });
 
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTrackNumber < mTracks.size() - 1) {
-                    mTrackNumber++;
-                    updateTrackDisplay();
-                    playTrack();
-                }
+                mPlayerService.playNext();
             }
         });
 
@@ -251,7 +230,7 @@ public class PlayerFragment extends DialogFragment {
                     mPlayButton.setImageResource(android.R.drawable.ic_media_play);
                 } else {
                     if (isOnPause) {
-                        mPlayerService.play();
+                        mPlayerService.resumePlay();
                     } else {
                         playTrack();
                     }
@@ -260,7 +239,6 @@ public class PlayerFragment extends DialogFragment {
                 }
             }
         });
-
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -280,10 +258,8 @@ public class PlayerFragment extends DialogFragment {
         });
 
         intentFilter = new IntentFilter();
-        intentFilter.addAction(PLAY_COMPLETED);
+        intentFilter.addAction(Constants.PLAY_COMPLETED);
         getActivity().registerReceiver(intentReceiver, intentFilter);
-
-//        updateTrackDisplay();
 
     }
 
@@ -291,7 +267,6 @@ public class PlayerFragment extends DialogFragment {
     @Override
     public void onPause() {
         Log.d(TAG, "onPause ");
-
         super.onPause();
         getActivity().unregisterReceiver(intentReceiver);
     }
@@ -302,7 +277,6 @@ public class PlayerFragment extends DialogFragment {
         Log.d(TAG, "onDestroy ");
 
         getActivity().unbindService(playerConnection);
-        //getActivity().stopService(playIntent);
         mPlayerService = null;
         super.onDestroyView();
     }
@@ -312,8 +286,7 @@ public class PlayerFragment extends DialogFragment {
     private void playTrack() {
         Log.d(TAG, "playTrack ");
 
-//        mPlayerService.setTrackNumber(mTrackNumber);
-//        mPlayerService.playTrack();
+        mPlayerService.playTrack();
         mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
 
         getActivity().runOnUiThread(new Runnable() {
@@ -382,13 +355,6 @@ public class PlayerFragment extends DialogFragment {
             Log.d(TAG, "onReceive ");
 
             Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT).show();
-/*            mPlayButton.setImageResource(android.R.drawable.ic_media_play);
-
-            if (mTrackNumber < mTracks.size() - 1) {
-                mTrackNumber++;
-                updateTrackDisplay();
-                playTrack();
-            }*/
         }
     };
 

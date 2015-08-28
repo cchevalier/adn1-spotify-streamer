@@ -20,6 +20,7 @@ import android.widget.Toast;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -35,22 +36,19 @@ import retrofit.RetrofitError;
  */
 public class ArtistFragment extends Fragment {
 
-    private static final String KEY_SEARCH_STRING = "KEY_SEARCH_STRING";
-    private static final String KEY_ARTISTS_FOUND = "KEY_ARTISTS_FOUND";
-    public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    private String mSearchString;
+    private ArrayList<MyArtist> mArtistsFound;
 
     private EditText mSearchView;
     private ListView mListArtistView;
 
     private ArtistAdapter mArtistAdapter;
 
-    private String mSearchString;
-    private ArrayList<MyArtist> mArtistsFound;
 
     public interface Callbacks {
-
         public void onArtistSelected(MyArtist selectedArtist);
     }
+
 
     public ArtistFragment() {
     }
@@ -61,13 +59,14 @@ public class ArtistFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mSearchString = savedInstanceState.getString(KEY_SEARCH_STRING);
-            mArtistsFound = savedInstanceState.getParcelableArrayList(KEY_ARTISTS_FOUND);
+            mSearchString = savedInstanceState.getString(Constants.KEY_SEARCH_STRING);
+            mArtistsFound = savedInstanceState.getParcelableArrayList(Constants.EXTRA_ARTIST);
         } else {
             mSearchString = "";
             mArtistsFound = new ArrayList<>();
         }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,7 +91,6 @@ public class ArtistFragment extends Fragment {
                 boolean handled = false;
 
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-
                     mSearchString = mSearchView.getText().toString();
 
                     // Hide the kb
@@ -103,9 +101,9 @@ public class ArtistFragment extends Fragment {
                     // Launch search as AsyncTask
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
                     task.execute(mSearchString);
-
                     handled = true;
                 }
+
                 return handled;
             }
         });
@@ -115,17 +113,9 @@ public class ArtistFragment extends Fragment {
         mListArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 MyArtist selectedArtist = mArtistAdapter.getItem(position);
-
                 ((Callbacks) getActivity()).onArtistSelected(selectedArtist);
 
-                // Start TracksActivity
-/*
-                Intent intent = new Intent(getActivity(), TracksActivity.class);
-                intent.putExtra(KEY_ARTIST_SELECTED, selectedArtist);
-                startActivity(intent);
-*/
             }
         });
 
@@ -135,10 +125,9 @@ public class ArtistFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
         // our own data to preserve
-        outState.putString(KEY_SEARCH_STRING, mSearchString);
-        outState.putParcelableArrayList(KEY_ARTISTS_FOUND, mArtistsFound);
+        outState.putString(Constants.KEY_SEARCH_STRING, mSearchString);
+        outState.putParcelableArrayList(Constants.EXTRA_ARTIST, mArtistsFound);
 
         super.onSaveInstanceState(outState);
     }
