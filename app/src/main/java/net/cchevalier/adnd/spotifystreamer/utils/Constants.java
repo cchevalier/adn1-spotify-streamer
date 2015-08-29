@@ -14,6 +14,7 @@ public class Constants {
     // Intents ACTION "net.cchevalier.adnd.spotifystreamer"
     public final static String ACTION_SHOW = "net.cchevalier.adnd.spotifystreamer.ACTION_SHOW";
     public final static String ACTION_START = "net.cchevalier.adnd.spotifystreamer.ACTION_START";
+    public final static String ACTION_DISPLAY_PLAYER = "net.cchevalier.adnd.spotifystreamer.ACTION_DISPLAY_PLAYER";
 
     //  Intents EXTRA
     public final static String EXTRA_ARTIST = "EXTRA_ARTIST";
@@ -21,7 +22,9 @@ public class Constants {
     public final static String EXTRA_TRACK_NB = "EXTRA_TRACK_NB";
 
     // Feedback ACTION messages
-    public final static String PLAY_COMPLETED = "PLAY_COMPLETED";
+    public final static String PS_LAST_SONG_COMPLETED = "PS_LAST_SONG_COMPLETED";
+    public final static String PS_NEW_SONG_STARTED = "PS_NEW_SONG_STARTED";
+    public final static String PS_START = "PS_START";
 
     public static final String KEY_SEARCH_STRING = "KEY_SEARCH_STRING";
 

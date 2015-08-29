@@ -18,6 +18,7 @@ The seekbar is implemented through a runnable/handler using the bound service to
 
 
 #### References
+
 - Guides on developer.android.com
     - [Guide Media Playback] (http://developer.android.com/guide/topics/media/mediaplayer.html)
     - [Guide Media Playback: Using a Service with MediaPlayer] (http://developer.android.com/guide/topics/media/mediaplayer.html#mpandservices)
@@ -25,12 +26,23 @@ The seekbar is implemented through a runnable/handler using the bound service to
     - [Services] (http://developer.android.com/guide/components/services.html)
     - [Bound Services] (http://developer.android.com/guide/components/bound-services.html)
     - [Bound Services: Managing the Lifecycle of a Bound Service] (http://developer.android.com/guide/components/bound-services.html#Lifecycle)
+
 - Tuts+
     - [Create a Music Player on Android: Project Setup] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-project-setup--mobile-22764)
     - [Create a Music Player on Android: Song Playback] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778)
     - [Create a Music Player on Android: User Controls] (http://code.tutsplus.com/tutorials/create-a-music-player-on-android-user-controls--mobile-22787)
+
 - Stackoverflow
     - [SeekBar and media player in android] (http://stackoverflow.com/questions/17168215/seekbar-and-media-player-in-android)
+
+- Intertech
+    - [Using LocalBroadcastManager in Service to Activity Communications] (http://www.intertech.com/Blog/using-localbroadcastmanager-in-service-to-activity-communications/)
+
+- Future Studio
+    - [Picasso — Callbacks, RemoteViews and Notifications] (https://futurestud.io/blog/picasso-callbacks-remoteviews-and-notifications/)
+
+
+#### Samples codes
 - Java Code Geeks
     - [Android MediaPlayer Example] (http://examples.javacodegeeks.com/android/android-mediaplayer-example/)
 - Android samples

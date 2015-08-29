@@ -10,8 +10,13 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
@@ -36,8 +41,8 @@ public class PlayerService extends Service implements
     private int mTrackNumber = -1;
     private MyTrack mCurrentTrack;
 
-
     private MediaPlayer mMediaPlayer = null;
+
 
     private final IBinder mPlayerBind = new PlayerBinder();
 
@@ -171,25 +176,96 @@ public class PlayerService extends Service implements
         Log.d(TAG, "onPrepared ");
         mp.start();
 
-        Toast.makeText(getApplicationContext(), "Now playing..." + mCurrentTrack.name, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "Now playing..." + mCurrentTrack.name, Toast.LENGTH_SHORT).show();
 
-        // Create a notification area notification so the user
-        // can get back to the MusicServiceClient
-        final Intent notificationIntent = new Intent(getApplicationContext(),
-                PlayerActivity.class);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+        sendBroadcastInfo(Constants.PS_NEW_SONG_STARTED);
+
+
+        // Create a notification area that get user back to the PlayerActivity (UI)
+
+        // Intents
+        final Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        notificationIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        PendingIntent prevPendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+        PendingIntent pausePendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+        PendingIntent nextPendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, 0);
 
-        final Notification notification = new Notification.Builder(
-                getApplicationContext())
+        // Building base notification
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_media_play)
-                .setOngoing(true).setContentTitle(mCurrentTrack.name)
+                .setOngoing(true)
+                .setContentTitle(mCurrentTrack.name)
                 .setContentText(mArtist.name + " / " + mCurrentTrack.album)
-                .setContentIntent(pendingIntent).build();
+                .setContentIntent(pendingIntent);
+
+        final Notification notification = mBuilder.build();
+
+        //
+        // RemoteViews for (normal) contentView
+        //
+        final RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_player);
+
+        remoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
+        Picasso.with(this)
+                .load(mCurrentTrack.UrlMediumImage)
+                .into(remoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
+
+        remoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
+        remoteViews.setTextColor(R.id.notification_track_name, getResources().getColor(android.R.color.black));
+        remoteViews.setTextViewText(R.id.notification_artist_name, mArtist.name);
+        remoteViews.setTextColor(R.id.notification_artist_name, getResources().getColor(android.R.color.black));
+
+        notification.contentView = remoteViews;
+
+
+        //
+        // RemoteViews for (big) contentView
+        //
+        final RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
+        bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
+        Picasso.with(this)
+                .load(mCurrentTrack.UrlMediumImage)
+                .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
+
+        bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
+        bigRemoteViews.setTextColor(R.id.notification_track_name, getResources().getColor(android.R.color.black));
+        bigRemoteViews.setTextViewText(R.id.notification_artist_name, mArtist.name);
+        bigRemoteViews.setTextColor(R.id.notification_artist_name, getResources().getColor(android.R.color.black));
+        bigRemoteViews.setTextViewText(R.id.notification_album_name, mCurrentTrack.album);
+        bigRemoteViews.setTextColor(R.id.notification_album_name, getResources().getColor(android.R.color.black));
+
+        notification.bigContentView = bigRemoteViews;
+
 
         // Put this Service in a foreground state, so it won't
         // readily be killed by the system
         startForeground(NOTIFICATION_ID, notification);
+
+
+
+        // Following would work only for And L 5.0 and above...
+/*
+        Notification altNotification = new Notification.Builder(getApplicationContext())
+                // Show controls on lock screen even when user hides sensitive content.
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(android.R.drawable.ic_media_play)
+                        // Add media control buttons that invoke intents in your media service
+                .addAction(android.R.drawable.ic_media_previous, "Previous", prevPendingIntent) // #0
+                .addAction(android.R.drawable.ic_media_pause, "Pause", pausePendingIntent)  // #1
+                .addAction(android.R.drawable.ic_media_next, "Next", nextPendingIntent)     // #2
+                        // Apply the media style template
+                .setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(1))
+                .setContentTitle(mCurrentTrack.name)
+                .setContentText(mArtist.name + " / " + mCurrentTrack.album)
+                .build();
+        startForeground(NOTIFICATION_ID, altNotification);
+*/
 
     }
 
@@ -210,16 +286,21 @@ public class PlayerService extends Service implements
         } else {
             Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
 
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(Constants.PLAY_COMPLETED);
-            getBaseContext().sendBroadcast(broadcastIntent);
+            sendBroadcastInfo(Constants.PS_LAST_SONG_COMPLETED);
 
             stopSelf();
         }
-
-
     }
 
+
+    private void sendBroadcastInfo(String info) {
+        Log.d(TAG, "sendBroadcastInfo " + info);
+        Intent broadcastInfoIntent = new Intent();
+        broadcastInfoIntent.setAction(info);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastInfoIntent);
+
+    }
 
     public void playTrack() {
         Log.d(TAG, "playTrack ");

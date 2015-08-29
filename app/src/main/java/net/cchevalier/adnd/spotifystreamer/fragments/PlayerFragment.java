@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,7 +93,7 @@ public class PlayerFragment extends DialogFragment {
                     if (mPlayerService != null) {
                         int currentPosition = mPlayerService.getCurrentPosition();
                         mSeekBar.setProgress(currentPosition);
-                        updateTrackDisplay();
+//                        updateTrackDisplay();
                         durationHandler.postDelayed(this, 1000);
                     }
                 }
@@ -155,31 +156,12 @@ public class PlayerFragment extends DialogFragment {
         mPlayButton = (ImageButton) rootView.findViewById(R.id.button_play_plause);
 
         mSeekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
-        mSeekBar.setMax(spotifyDuration);
         mSeekBar.setClickable(false);
 
-        // Handles intent
-/*
-        Intent intent = getActivity().getIntent();
-        if (intent != null) {
-            if (intent.hasExtra(KEY_ARTIST_SELECTED)) {
-                mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
-            }
-            if (intent.hasExtra(KEY_POSITION)) {
-                mTrackNumber = intent.getIntExtra(KEY_POSITION, 0);
-            }
-            if (intent.hasExtra(KEY_TRACKS_FOUND)) {
-                mTracks = intent.getParcelableArrayListExtra(KEY_TRACKS_FOUND);
-            }
-        }
-*/
+        mSeekBar.setMax(spotifyDuration);
 
         return rootView;
     }
-
-
-
-
 
 
     @Override
@@ -206,6 +188,10 @@ public class PlayerFragment extends DialogFragment {
     public void onResume() {
         Log.d(TAG, "onResume ");
         super.onResume();
+
+        if (mPlayerBound) {
+            updateTrackDisplay();
+        }
 
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -258,8 +244,9 @@ public class PlayerFragment extends DialogFragment {
         });
 
         intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.PLAY_COMPLETED);
-        getActivity().registerReceiver(intentReceiver, intentFilter);
+        intentFilter.addAction(Constants.PS_LAST_SONG_COMPLETED);
+        intentFilter.addAction(Constants.PS_NEW_SONG_STARTED);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(intentReceiver, intentFilter);
 
     }
 
@@ -268,7 +255,7 @@ public class PlayerFragment extends DialogFragment {
     public void onPause() {
         Log.d(TAG, "onPause ");
         super.onPause();
-        getActivity().unregisterReceiver(intentReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(intentReceiver);
     }
 
 
@@ -352,9 +339,16 @@ public class PlayerFragment extends DialogFragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive ");
+            String info = intent.getAction();
+            Log.d(TAG, "onReceive " + info);
 
-            Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT).show();
+            if (info == Constants.PS_NEW_SONG_STARTED) {
+                updateTrackDisplay();
+            } else if (info == Constants.PS_LAST_SONG_COMPLETED) {
+                Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT).show();
+            } else {
+
+            }
         }
     };
 
