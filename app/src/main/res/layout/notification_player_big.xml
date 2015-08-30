@@ -11,6 +11,7 @@
         android:id="@+id/notification_album_art"
         android:layout_width="140dp"
         android:layout_height="140dp"
+        android:layout_gravity="center"
         android:padding="2dp"
         android:src="@android:drawable/ic_menu_help"
         tools:background="#F09664"

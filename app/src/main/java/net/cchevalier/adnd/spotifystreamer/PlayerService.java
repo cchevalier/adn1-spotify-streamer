@@ -4,11 +4,13 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -222,24 +224,28 @@ public class PlayerService extends Service implements
 
         notification.contentView = remoteViews;
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean showControlsOnNotification = prefs.getBoolean(getString(R.string.pref_controls_key), true);
 
-        //
-        // RemoteViews for (big) contentView
-        //
-        final RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
-        bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
-        Picasso.with(this)
-                .load(mCurrentTrack.UrlMediumImage)
-                .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
+        if (showControlsOnNotification) {
+            //
+            // RemoteViews for (big) contentView
+            //
+            final RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
+            bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
+            Picasso.with(this)
+                    .load(mCurrentTrack.UrlMediumImage)
+                    .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
 
-        bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
-        bigRemoteViews.setTextColor(R.id.notification_track_name, getResources().getColor(android.R.color.black));
-        bigRemoteViews.setTextViewText(R.id.notification_artist_name, mArtist.name);
-        bigRemoteViews.setTextColor(R.id.notification_artist_name, getResources().getColor(android.R.color.black));
-        bigRemoteViews.setTextViewText(R.id.notification_album_name, mCurrentTrack.album);
-        bigRemoteViews.setTextColor(R.id.notification_album_name, getResources().getColor(android.R.color.black));
+            bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
+            bigRemoteViews.setTextColor(R.id.notification_track_name, getResources().getColor(android.R.color.black));
+            bigRemoteViews.setTextViewText(R.id.notification_artist_name, mArtist.name);
+            bigRemoteViews.setTextColor(R.id.notification_artist_name, getResources().getColor(android.R.color.black));
+            bigRemoteViews.setTextViewText(R.id.notification_album_name, mCurrentTrack.album);
+            bigRemoteViews.setTextColor(R.id.notification_album_name, getResources().getColor(android.R.color.black));
 
-        notification.bigContentView = bigRemoteViews;
+            notification.bigContentView = bigRemoteViews;
+        }
 
 
         // Put this Service in a foreground state, so it won't
@@ -326,7 +332,7 @@ public class PlayerService extends Service implements
     }
 
     public void playPrevious(){
-        if (mTrackNumber > 1){
+        if (mTrackNumber > 0){
             mTrackNumber--;
             playTrack();
         }
