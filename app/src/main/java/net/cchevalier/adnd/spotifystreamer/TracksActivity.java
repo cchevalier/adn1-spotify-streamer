@@ -48,7 +48,7 @@ public class TracksActivity extends AppCompatActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setSubtitle(artistName);
         }

@@ -23,7 +23,7 @@
     <string name="title_activity_tracks">Top 10 Tracks</string>
 
     <!-- -->
-    <string name="title_activity_player">Spotify Streamer</string>
+    <string name="title_activity_player">Now playing</string>
 
 
     <!--Country name / code according to ISO 3166-2 (sample subset)-->
