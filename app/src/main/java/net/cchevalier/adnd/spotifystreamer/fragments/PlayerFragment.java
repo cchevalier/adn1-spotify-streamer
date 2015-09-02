@@ -215,11 +215,10 @@ public class PlayerFragment extends DialogFragment {
                     isOnPause = true;
                     mPlayButton.setImageResource(android.R.drawable.ic_media_play);
                 } else {
-                    if (isOnPause) {
-                        mPlayerService.resumePlay();
-                    } else {
-                        playTrack();
-                    }
+//                    if (isOnPause) {
+                    mPlayerService.resumePlay();
+//                    } else {
+//                        playTrack();
                     isOnPause = false;
                     mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
                 }
@@ -244,8 +243,10 @@ public class PlayerFragment extends DialogFragment {
         });
 
         intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.PS_LAST_SONG_COMPLETED);
-        intentFilter.addAction(Constants.PS_NEW_SONG_STARTED);
+        intentFilter.addAction(Constants.PS_LAST_TRACK_COMPLETED);
+        intentFilter.addAction(Constants.PS_NEW_TRACK_STARTED);
+        intentFilter.addAction(Constants.PS_TRACK_PAUSE);
+        intentFilter.addAction(Constants.PS_TRACK_RESUME);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(intentReceiver, intentFilter);
 
     }
@@ -303,6 +304,14 @@ public class PlayerFragment extends DialogFragment {
         mTracks = mPlayerService.getTracks();
         mTrackNumber = mPlayerService.getTrackNumber();
 
+/*
+        if (mPlayerService.isPlaying()) {
+            mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+        } else {
+            mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+        }
+*/
+
         if (mTrackNumber == 0) {
             mPreviousButton.setEnabled(false);
             mPreviousButton.setClickable(false);
@@ -342,12 +351,16 @@ public class PlayerFragment extends DialogFragment {
             String info = intent.getAction();
             Log.d(TAG, "onReceive " + info);
 
-            if (info == Constants.PS_NEW_SONG_STARTED) {
+            if (info == Constants.PS_NEW_TRACK_STARTED) {
                 updateTrackDisplay();
-            } else if (info == Constants.PS_LAST_SONG_COMPLETED) {
+            } else if (info == Constants.PS_LAST_TRACK_COMPLETED) {
                 Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT).show();
-            } else {
-
+            } else if (info == Constants.PS_TRACK_PAUSE){
+                updateTrackDisplay();
+                mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+            } else if (info == Constants.PS_TRACK_RESUME) {
+                updateTrackDisplay();
+                mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
             }
         }
     };

@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
 
         if (mUiTablet) {
             Bundle arguments = new Bundle();
-            arguments.putBoolean(Constants.KEY_TABLET, mUiTablet);
+            arguments.putBoolean(Constants.EXTRA_IS_TABLET, mUiTablet);
             arguments.putParcelable(Constants.EXTRA_ARTIST, selectedArtist);
 
             TracksFragment tracksFragment = new TracksFragment();
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Start TracksActivity
             Intent intent = new Intent(this, TracksActivity.class);
-            intent.putExtra(Constants.KEY_TABLET, mUiTablet);
+            intent.putExtra(Constants.EXTRA_IS_TABLET, mUiTablet);
             intent.putExtra(Constants.EXTRA_ARTIST, selectedArtist);
             startActivity(intent);
         }

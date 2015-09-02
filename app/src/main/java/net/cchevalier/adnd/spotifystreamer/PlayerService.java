@@ -142,6 +142,24 @@ public class PlayerService extends Service implements
             playTrack();
         }
 
+        if (intent.getAction() == Constants.ACTION_PLAY_PREVIOUS) {
+            playPrevious();
+        }
+
+        if (intent.getAction() == Constants.ACTION_PLAY_NEXT) {
+            playNext();
+        }
+
+        if (intent.getAction() == Constants.ACTION_PLAY_PAUSE) {
+            if (isPlaying()) {
+                pause();
+            } else {
+                resumePlay();
+            }
+            updateNotification();
+        }
+
+
         return START_STICKY;
     }
 
@@ -180,22 +198,19 @@ public class PlayerService extends Service implements
 
         //Toast.makeText(getApplicationContext(), "Now playing..." + mCurrentTrack.name, Toast.LENGTH_SHORT).show();
 
-        sendBroadcastInfo(Constants.PS_NEW_SONG_STARTED);
+        sendBroadcastInfo(Constants.PS_NEW_TRACK_STARTED);
+        updateNotification();
 
 
+    }
+
+    private void updateNotification() {
         // Create a notification area that get user back to the PlayerActivity (UI)
 
-        // Intents
-        final Intent notificationIntent = new Intent(getApplicationContext(), PlayerActivity.class);
-        notificationIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        PendingIntent prevPendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
-        PendingIntent pausePendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
-        PendingIntent nextPendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
+        // Display Player Intent
+        final Intent displayPlayerIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
+        final PendingIntent displayPlayerPendingIntent = PendingIntent.getActivity(this, 0, displayPlayerIntent, 0);
 
         // Building base notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
@@ -203,7 +218,7 @@ public class PlayerService extends Service implements
                 .setOngoing(true)
                 .setContentTitle(mCurrentTrack.name)
                 .setContentText(mArtist.name + " / " + mCurrentTrack.album)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(displayPlayerPendingIntent);
 
         final Notification notification = mBuilder.build();
 
@@ -224,18 +239,23 @@ public class PlayerService extends Service implements
 
         notification.contentView = remoteViews;
 
+        //
+        // RemoteViews for (big) contentView (with controls based on user prefs)
+        //
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean showControlsOnNotification = prefs.getBoolean(getString(R.string.pref_controls_key), true);
-
         if (showControlsOnNotification) {
-            //
-            // RemoteViews for (big) contentView
-            //
             final RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
             bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
             Picasso.with(this)
                     .load(mCurrentTrack.UrlMediumImage)
                     .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
+
+            if (isPlaying()) {
+                bigRemoteViews.setImageViewResource(R.id.button_play_plause, android.R.drawable.ic_media_pause);
+            } else {
+                bigRemoteViews.setImageViewResource(R.id.button_play_plause, android.R.drawable.ic_media_play);
+            }
 
             bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
             bigRemoteViews.setTextColor(R.id.notification_track_name, getResources().getColor(android.R.color.black));
@@ -244,6 +264,23 @@ public class PlayerService extends Service implements
             bigRemoteViews.setTextViewText(R.id.notification_album_name, mCurrentTrack.album);
             bigRemoteViews.setTextColor(R.id.notification_album_name, getResources().getColor(android.R.color.black));
 
+            // Controls handling
+            final Intent previousIntent = new Intent(getApplicationContext(), this.getClass());
+            previousIntent.setAction(Constants.ACTION_PLAY_PREVIOUS);
+            final PendingIntent previousPendingIntent = PendingIntent.getService(getApplicationContext(), 0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            bigRemoteViews.setOnClickPendingIntent(R.id.button_previous, previousPendingIntent);
+
+            final Intent nextIntent = new Intent(getApplicationContext(), this.getClass());
+            nextIntent.setAction(Constants.ACTION_PLAY_NEXT);
+            final PendingIntent nextPendingIntent = PendingIntent.getService(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            bigRemoteViews.setOnClickPendingIntent(R.id.button_next, nextPendingIntent);
+
+            final Intent playPauseIntent = new Intent(getApplicationContext(), this.getClass());
+            playPauseIntent.setAction(Constants.ACTION_PLAY_PAUSE);
+            final PendingIntent playPausePendingIntent = PendingIntent.getService(getApplicationContext(), 0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            bigRemoteViews.setOnClickPendingIntent(R.id.button_play_plause, playPausePendingIntent);
+
+
             notification.bigContentView = bigRemoteViews;
         }
 
@@ -251,28 +288,6 @@ public class PlayerService extends Service implements
         // Put this Service in a foreground state, so it won't
         // readily be killed by the system
         startForeground(NOTIFICATION_ID, notification);
-
-
-
-        // Following would work only for And L 5.0 and above...
-/*
-        Notification altNotification = new Notification.Builder(getApplicationContext())
-                // Show controls on lock screen even when user hides sensitive content.
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setSmallIcon(android.R.drawable.ic_media_play)
-                        // Add media control buttons that invoke intents in your media service
-                .addAction(android.R.drawable.ic_media_previous, "Previous", prevPendingIntent) // #0
-                .addAction(android.R.drawable.ic_media_pause, "Pause", pausePendingIntent)  // #1
-                .addAction(android.R.drawable.ic_media_next, "Next", nextPendingIntent)     // #2
-                        // Apply the media style template
-                .setStyle(new Notification.MediaStyle()
-                        .setShowActionsInCompactView(1))
-                .setContentTitle(mCurrentTrack.name)
-                .setContentText(mArtist.name + " / " + mCurrentTrack.album)
-                .build();
-        startForeground(NOTIFICATION_ID, altNotification);
-*/
-
     }
 
     @Override
@@ -292,7 +307,7 @@ public class PlayerService extends Service implements
         } else {
             Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
 
-            sendBroadcastInfo(Constants.PS_LAST_SONG_COMPLETED);
+            sendBroadcastInfo(Constants.PS_LAST_TRACK_COMPLETED);
 
             stopSelf();
         }
@@ -340,11 +355,15 @@ public class PlayerService extends Service implements
 
     public void pause() {
         mMediaPlayer.pause();
+        sendBroadcastInfo(Constants.PS_TRACK_PAUSE);
+        updateNotification();
     }
 
 
     public void resumePlay() {
         mMediaPlayer.start();
+        sendBroadcastInfo(Constants.PS_TRACK_RESUME);
+        updateNotification();
     }
 
     public void seekTo(int position) {

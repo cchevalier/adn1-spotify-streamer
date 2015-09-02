@@ -36,7 +36,7 @@ public class TracksActivity extends AppCompatActivity {
             artistName = artist.name;
 
             Bundle arguments = new Bundle();
-            arguments.putBoolean(Constants.KEY_TABLET, mTwoPane);
+            arguments.putBoolean(Constants.EXTRA_IS_TABLET, mTwoPane);
             arguments.putParcelable(Constants.EXTRA_ARTIST, artist);
 
             TracksFragment tracksFragment = new TracksFragment();

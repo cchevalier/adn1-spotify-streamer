@@ -71,8 +71,8 @@ public class TracksFragment extends Fragment {
         }
         mArtistId = mArtist.id;
 
-        if (getArguments().containsKey(Constants.KEY_TABLET)) {
-            mUiTablet = getArguments().getBoolean(Constants.KEY_TABLET);
+        if (getArguments().containsKey(Constants.EXTRA_IS_TABLET)) {
+            mUiTablet = getArguments().getBoolean(Constants.EXTRA_IS_TABLET);
         }
 
     }

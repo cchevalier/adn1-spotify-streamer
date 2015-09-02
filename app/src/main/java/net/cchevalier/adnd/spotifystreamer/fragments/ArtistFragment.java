@@ -59,7 +59,7 @@ public class ArtistFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mSearchString = savedInstanceState.getString(Constants.KEY_SEARCH_STRING);
+            mSearchString = savedInstanceState.getString(Constants.EXTRA_SEARCH_STRING);
             mArtistsFound = savedInstanceState.getParcelableArrayList(Constants.EXTRA_ARTIST);
         } else {
             mSearchString = "";
@@ -126,7 +126,7 @@ public class ArtistFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // our own data to preserve
-        outState.putString(Constants.KEY_SEARCH_STRING, mSearchString);
+        outState.putString(Constants.EXTRA_SEARCH_STRING, mSearchString);
         outState.putParcelableArrayList(Constants.EXTRA_ARTIST, mArtistsFound);
 
         super.onSaveInstanceState(outState);
