@@ -41,11 +41,7 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.container_fragment_tracks) != null) {
-            mUiTablet = true;
-        } else {
-            mUiTablet = false;
-        }
+        mUiTablet = findViewById(R.id.container_fragment_tracks) != null;
     }
 
 

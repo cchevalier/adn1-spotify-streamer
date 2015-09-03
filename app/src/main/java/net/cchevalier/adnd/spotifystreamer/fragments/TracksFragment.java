@@ -68,8 +68,8 @@ public class TracksFragment extends Fragment {
 
         if (getArguments().containsKey(Constants.EXTRA_ARTIST)) {
             mArtist = getArguments().getParcelable(Constants.EXTRA_ARTIST);
+            mArtistId = mArtist.id;
         }
-        mArtistId = mArtist.id;
 
         if (getArguments().containsKey(Constants.EXTRA_IS_TABLET)) {
             mUiTablet = getArguments().getBoolean(Constants.EXTRA_IS_TABLET);
