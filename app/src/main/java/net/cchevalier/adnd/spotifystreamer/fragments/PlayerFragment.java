@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +60,9 @@ public class PlayerFragment extends DialogFragment {
     private ImageView mAlbumArtView;
     private TextView mTrackView;
 
+    private TextView mCurrentTime;
+    private TextView mTotalDuration;
+
     private ImageButton mPreviousButton;
     private ImageButton mPlayButton;
     private ImageButton mNextButton;
@@ -66,7 +70,14 @@ public class PlayerFragment extends DialogFragment {
     private SeekBar mSeekBar;
 
     private int spotifyDuration = 30000;
-    private Handler durationHandler = new Handler();
+
+    private Handler durationHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            updateProgress();
+        }
+    };
 
     private IntentFilter intentFilter;
 
@@ -93,9 +104,9 @@ public class PlayerFragment extends DialogFragment {
                     if (mPlayerService != null) {
                         int currentPosition = mPlayerService.getCurrentPosition();
                         mSeekBar.setProgress(currentPosition);
-//                        updateTrackDisplay();
-                        durationHandler.postDelayed(this, 1000);
+                        mCurrentTime.setText(msToMinSec(currentPosition));
                     }
+                    durationHandler.postDelayed(this, 1000);
                 }
             });
 
@@ -112,7 +123,6 @@ public class PlayerFragment extends DialogFragment {
 
 
     public PlayerFragment() {
-        Log.d(TAG, "PlayerFragment ");
     }
 
     @Override
@@ -150,6 +160,9 @@ public class PlayerFragment extends DialogFragment {
         mAlbumView = (TextView) rootView.findViewById(R.id.mp_album);
         mTrackView = (TextView) rootView.findViewById(R.id.mp_track);
         mAlbumArtView = (ImageView) rootView.findViewById(R.id.mp_album_img);
+
+        mCurrentTime = (TextView) rootView.findViewById(R.id.mp_current_time);
+        mTotalDuration = (TextView) rootView.findViewById(R.id.mp_total_duration);
 
         mPreviousButton = (ImageButton) rootView.findViewById(R.id.button_previous);
         mNextButton = (ImageButton) rootView.findViewById(R.id.button_next);
@@ -277,17 +290,72 @@ public class PlayerFragment extends DialogFragment {
         mPlayerService.playTrack();
         mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
 
+/*
+        Thread myThread = new Thread(new Runnable() {
+            int currentTime = 60;
+
+            @Override
+            public void run() {
+
+                try {
+                    Thread.sleep(1000);
+                    Log.d(TAG, "run burps");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                durationHandler.sendEmptyMessage(0);
+
+*/
+/*
+                if (mPlayerService != null) {
+                    currentTime = mPlayerService.getCurrentPosition();
+                    mSeekBar.setProgress(currentTime);
+
+                    durationHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCurrentTime.setText(Integer.toString(currentTime) + "");
+                        }
+                    });
+                }
+*//*
+
+
+            }
+        });
+
+//        myThread.start();
+
+*/
+
+/*
+        // Submission Stage 2 - attempt 1
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mPlayerService != null) {
-                    int currentPosition = mPlayerService.getCurrentPosition();
-                    mSeekBar.setProgress(currentPosition);
+                    int currentTime = mPlayerService.getCurrentPosition();
+                    mCurrentTime.setText(msToMinSec(currentTime));
+                    mSeekBar.setProgress(currentTime);
                     durationHandler.postDelayed(this, 1000);
                 }
             }
         });
+*/
+
     }
+
+
+    private void updateProgress() {
+        Log.d(TAG, "updateProgress ");
+        if (mPlayerService != null) {
+            int currentTime = mPlayerService.getCurrentPosition();
+            mSeekBar.setProgress(currentTime);
+            mCurrentTime.setText(msToMinSec(currentTime));
+        }
+    }
+
 
 
     private void updateTrackDisplay() {
@@ -303,6 +371,17 @@ public class PlayerFragment extends DialogFragment {
 
         mTracks = mPlayerService.getTracks();
         mTrackNumber = mPlayerService.getTrackNumber();
+
+        if (mPlayerService != null & mPlayerService.isPlaying()) {
+            int totalDuration = mPlayerService.getDuration();
+            mSeekBar.setMax(totalDuration);
+            mTotalDuration.setText(msToMinSec(totalDuration));
+
+            int currentTime = mPlayerService.getCurrentPosition();
+            mCurrentTime.setText(msToMinSec(currentTime));
+        }
+
+
 
 /*
         if (mPlayerService.isPlaying()) {
@@ -341,6 +420,23 @@ public class PlayerFragment extends DialogFragment {
         } else {
             mAlbumArtView.setImageResource(android.R.drawable.ic_menu_help);
         }
+    }
+
+
+    private String msToMinSec(int ms) {
+
+        ms = ms / 1000;
+
+        int min = ms / 60;
+        int sec = ms % 60;
+
+        String resultString = Integer.toString(min) + ":";
+        if (sec < 10) {
+            resultString = resultString + "0";
+        }
+        resultString = resultString + Integer.toString(sec);
+
+        return resultString;
     }
 
 
