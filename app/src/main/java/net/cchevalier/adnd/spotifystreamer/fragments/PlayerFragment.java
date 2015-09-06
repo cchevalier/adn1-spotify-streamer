@@ -192,7 +192,7 @@ public class PlayerFragment extends DialogFragment {
         super.onStart();
 
         playIntent = new Intent(getActivity(), PlayerService.class);
-        playIntent.setAction(Constants.ACTION_SHOW);
+        playIntent.setAction(Constants.ACTION_CONNECT);
         getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
     }
 

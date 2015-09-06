@@ -1,13 +1,17 @@
 package net.cchevalier.adnd.spotifystreamer;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.PlayerFragment;
@@ -25,6 +29,30 @@ public class MainActivity extends AppCompatActivity
     private final String TAG = "MAIN_ACT";
 
     private boolean mUiTablet;
+
+    private PlayerService mPlayerService;
+    private boolean mPlayerServiceBound;
+    private ServiceConnection playerServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected ");
+
+            PlayerService.PlayerBinder binder = (PlayerService.PlayerBinder)service;
+            mPlayerService = binder.getService();
+            mPlayerServiceBound = true;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected ");
+
+            mPlayerServiceBound = false;
+        }
+
+    };
+
 
 
     @Override
@@ -50,6 +78,10 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onStart ");
 
         super.onStart();
+
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        playerServiceIntent.setAction(Constants.ACTION_CONNECT);
+        bindService(playerServiceIntent, playerServiceConnection, BIND_AUTO_CREATE);
     }
 
 
@@ -89,6 +121,9 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "onDestroy ");
 
+        unbindService(playerServiceConnection);
+        mPlayerService = null;
+
         super.onDestroy();
     }
 
@@ -107,15 +142,32 @@ public class MainActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+
+            case R.id.action_share:
+                Toast.makeText(this, "Share on the way...", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.action_now_playing:
+                if (mPlayerService.isPlaying()) {
+                    final Intent displayPlayerIntent = new Intent(this, PlayerActivity.class);
+                    displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
+                    startActivity(displayPlayerIntent);
+
+                }
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
 
-        return super.onOptionsItemSelected(item);
+        //noinspection SimplifiableIfStatement
     }
 
 

@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -156,7 +157,7 @@ public class PlayerService extends Service implements
             } else {
                 resumePlay();
             }
-            updateNotification();
+//            updateNotification();
         }
 
 
@@ -167,7 +168,6 @@ public class PlayerService extends Service implements
         Log.d(TAG, "initMediaPlayer ");
 
         mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         mMediaPlayer.setOnPreparedListener(this);
@@ -225,7 +225,7 @@ public class PlayerService extends Service implements
         //
         // RemoteViews for (normal) contentView
         //
-        final RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_player);
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_player);
 
         remoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
         Picasso.with(this)
@@ -245,7 +245,7 @@ public class PlayerService extends Service implements
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean showControlsOnNotification = prefs.getBoolean(getString(R.string.pref_controls_key), true);
         if (showControlsOnNotification) {
-            final RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
+            RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
             bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
             Picasso.with(this)
                     .load(mCurrentTrack.UrlMediumImage)
@@ -255,6 +255,14 @@ public class PlayerService extends Service implements
                 bigRemoteViews.setImageViewResource(R.id.button_play_plause, android.R.drawable.ic_media_pause);
             } else {
                 bigRemoteViews.setImageViewResource(R.id.button_play_plause, android.R.drawable.ic_media_play);
+            }
+
+            if (isLastTrack()) {
+                bigRemoteViews.setViewVisibility(R.id.button_next, View.INVISIBLE);
+            }
+
+            if (isFirstTrack()) {
+                bigRemoteViews.setViewVisibility(R.id.button_previous, View.INVISIBLE);
             }
 
             bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
@@ -372,6 +380,14 @@ public class PlayerService extends Service implements
 
     public boolean isPlaying() {
         return mMediaPlayer.isPlaying();
+    }
+
+    public boolean isFirstTrack() {
+        return (mTrackNumber == 0);
+    }
+
+    public boolean isLastTrack() {
+        return (mTrackNumber == (mTracks.size() - 1));
     }
 
     public void setTracks(ArrayList<MyTrack> theTracks) {
