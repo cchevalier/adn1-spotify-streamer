@@ -17,7 +17,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private final String TAG = "TRACKS_ACT";
 
-    private boolean mTwoPane = false;
+    private boolean mUiTablet = false;
 
 
     @Override
@@ -36,7 +36,7 @@ public class TracksActivity extends AppCompatActivity {
             artistName = artist.name;
 
             Bundle arguments = new Bundle();
-            arguments.putBoolean(Constants.EXTRA_IS_TABLET, mTwoPane);
+            arguments.putBoolean(Constants.EXTRA_IS_TABLET, mUiTablet);
             arguments.putParcelable(Constants.EXTRA_ARTIST, artist);
 
             TracksFragment tracksFragment = new TracksFragment();

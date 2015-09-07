@@ -41,7 +41,7 @@ public class PlayerService extends Service implements
     // Tracks settings
     private MyArtist mArtist;
     private ArrayList<MyTrack> mTracks = null;
-    private int mTrackNumber = -1;
+    private int mTrackNumber;
     private MyTrack mCurrentTrack;
 
     private MediaPlayer mMediaPlayer = null;
@@ -53,9 +53,6 @@ public class PlayerService extends Service implements
 
 
 
-    /*
-    * PlayerBinder
-    * */
     public class PlayerBinder extends Binder {
 
         public PlayerService getService() {
@@ -83,14 +80,13 @@ public class PlayerService extends Service implements
 
     @Override
     public void onRebind(Intent intent) {
+        Log.d(TAG, "onRebind ");
         super.onRebind(intent);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind ");
-//        mMediaPlayer.stop();
-//        mMediaPlayer.release();
         return false;
     }
 
@@ -100,31 +96,13 @@ public class PlayerService extends Service implements
         Log.d(TAG, "onCreate ");
         super.onCreate();
 
+        /*
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
             initMediaPlayer();
         }
+        */
 
-
-/*
-        // Create a notification area notification so the user
-        // can get back to the MusicServiceClient
-        final Intent notificationIntent = new Intent(getApplicationContext(),
-                MainActivity.class);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
-
-        final Notification notification = new Notification.Builder(
-                getApplicationContext())
-                .setSmallIcon(android.R.drawable.ic_media_play)
-                .setOngoing(true).setContentTitle("Music Playing")
-                .setContentText("Click to Access Music Player")
-                .setContentIntent(pendingIntent).build();
-
-        // Put this Service in a foreground state, so it won't
-        // readily be killed by the system
-        startForeground(NOTIFICATION_ID, notification);
-*/
     }
 
 
@@ -137,9 +115,16 @@ public class PlayerService extends Service implements
         }
 
         if (intent.getAction() == Constants.ACTION_START) {
+
+            if (mMediaPlayer == null) {
+                mMediaPlayer = new MediaPlayer();
+                initMediaPlayer();
+            }
+
             mArtist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
             mTracks = intent.getParcelableArrayListExtra(Constants.EXTRA_TRACKS);
             mTrackNumber = intent.getIntExtra(Constants.EXTRA_TRACK_NB, 0);
+
             playTrack();
         }
 
@@ -157,9 +142,7 @@ public class PlayerService extends Service implements
             } else {
                 resumePlay();
             }
-//            updateNotification();
         }
-
 
         return START_STICKY;
     }
@@ -179,11 +162,13 @@ public class PlayerService extends Service implements
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy ");
+
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
-        Toast.makeText(this, "PlayerService done", Toast.LENGTH_SHORT).show();
+
+        //Toast.makeText(this, "PlayerService done", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 
@@ -245,8 +230,11 @@ public class PlayerService extends Service implements
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean showControlsOnNotification = prefs.getBoolean(getString(R.string.pref_controls_key), true);
         if (showControlsOnNotification) {
+
             RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
+
             bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
+
             Picasso.with(this)
                     .load(mCurrentTrack.UrlMediumImage)
                     .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
@@ -259,10 +247,14 @@ public class PlayerService extends Service implements
 
             if (isLastTrack()) {
                 bigRemoteViews.setViewVisibility(R.id.button_next, View.INVISIBLE);
+            } else {
+                bigRemoteViews.setViewVisibility(R.id.button_next, View.VISIBLE);
             }
 
             if (isFirstTrack()) {
                 bigRemoteViews.setViewVisibility(R.id.button_previous, View.INVISIBLE);
+            } else {
+                bigRemoteViews.setViewVisibility(R.id.button_previous, View.VISIBLE);
             }
 
             bigRemoteViews.setTextViewText(R.id.notification_track_name, mCurrentTrack.name);
@@ -288,10 +280,8 @@ public class PlayerService extends Service implements
             final PendingIntent playPausePendingIntent = PendingIntent.getService(getApplicationContext(), 0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             bigRemoteViews.setOnClickPendingIntent(R.id.button_play_plause, playPausePendingIntent);
 
-
             notification.bigContentView = bigRemoteViews;
         }
-
 
         // Put this Service in a foreground state, so it won't
         // readily be killed by the system
@@ -309,13 +299,13 @@ public class PlayerService extends Service implements
     public void onCompletion(MediaPlayer mp) {
         Log.d(TAG, "onCompletion ");
 
-        if (mTrackNumber < mTracks.size() - 1) {
+        if (!isLastTrack()) {
             mTrackNumber++;
             playTrack();
         } else {
             Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
-
             sendBroadcastInfo(Constants.PS_LAST_TRACK_COMPLETED);
+            updateNotification();
 
             stopSelf();
         }
@@ -324,6 +314,7 @@ public class PlayerService extends Service implements
 
     private void sendBroadcastInfo(String info) {
         Log.d(TAG, "sendBroadcastInfo " + info);
+
         Intent broadcastInfoIntent = new Intent();
         broadcastInfoIntent.setAction(info);
 
@@ -348,14 +339,14 @@ public class PlayerService extends Service implements
     }
 
     public void playNext(){
-        if (mTrackNumber < mTracks.size() - 1){
+        if (!isLastTrack()){
             mTrackNumber++;
             playTrack();
         }
     }
 
     public void playPrevious(){
-        if (mTrackNumber > 0){
+        if (!isFirstTrack()){
             mTrackNumber--;
             playTrack();
         }
@@ -378,6 +369,16 @@ public class PlayerService extends Service implements
         mMediaPlayer.seekTo(position);
     }
 
+    public int getCurrentTime() {
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+    public int getTotalDuration() {
+        return mMediaPlayer.getDuration();
+    }
+
+
+
     public boolean isPlaying() {
         return mMediaPlayer.isPlaying();
     }
@@ -390,9 +391,15 @@ public class PlayerService extends Service implements
         return (mTrackNumber == (mTracks.size() - 1));
     }
 
+
     public void setTracks(ArrayList<MyTrack> theTracks) {
         mTracks = theTracks;
     }
+
+    public ArrayList<MyTrack> getTracks() {
+        return mTracks;
+    }
+
 
     public void setTrackNumber(int number) {
         this.mTrackNumber = number;
@@ -402,9 +409,6 @@ public class PlayerService extends Service implements
         return mTrackNumber;
     }
 
-    public ArrayList<MyTrack> getTracks() {
-        return mTracks;
-    }
 
     public MyTrack getCurrentTrack() {
         return mCurrentTrack;
@@ -412,14 +416,6 @@ public class PlayerService extends Service implements
 
     public MyArtist getArtist() {
         return mArtist;
-    }
-
-    public int getCurrentPosition() {
-        return mMediaPlayer.getCurrentPosition();
-    }
-
-    public int getDuration() {
-        return mMediaPlayer.getDuration();
     }
 
 }

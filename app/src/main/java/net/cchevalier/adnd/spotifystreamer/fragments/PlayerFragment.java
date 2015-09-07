@@ -79,12 +79,12 @@ public class PlayerFragment extends DialogFragment {
         }
     };
 
-    private IntentFilter intentFilter;
+    private IntentFilter broadcastIntentFilter;
 
 
-    /*
-    playerConnection = ServiceConnection to PlayerService
-    */
+    //
+    // playerConnection = ServiceConnection to PlayerService
+    //
 
     private ServiceConnection playerConnection = new ServiceConnection() {
 
@@ -102,9 +102,9 @@ public class PlayerFragment extends DialogFragment {
                 @Override
                 public void run() {
                     if (mPlayerService != null) {
-                        int currentPosition = mPlayerService.getCurrentPosition();
-                        mSeekBar.setProgress(currentPosition);
-                        mCurrentTime.setText(msToMinSec(currentPosition));
+                        int currentTime = mPlayerService.getCurrentTime();
+                        mSeekBar.setProgress(currentTime);
+                        mCurrentTime.setText(msToMinSec(currentTime));
                     }
                     durationHandler.postDelayed(this, 1000);
                 }
@@ -255,12 +255,12 @@ public class PlayerFragment extends DialogFragment {
             }
         });
 
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.PS_LAST_TRACK_COMPLETED);
-        intentFilter.addAction(Constants.PS_NEW_TRACK_STARTED);
-        intentFilter.addAction(Constants.PS_TRACK_PAUSE);
-        intentFilter.addAction(Constants.PS_TRACK_RESUME);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(intentReceiver, intentFilter);
+        broadcastIntentFilter = new IntentFilter();
+        broadcastIntentFilter.addAction(Constants.PS_LAST_TRACK_COMPLETED);
+        broadcastIntentFilter.addAction(Constants.PS_NEW_TRACK_STARTED);
+        broadcastIntentFilter.addAction(Constants.PS_TRACK_PAUSE);
+        broadcastIntentFilter.addAction(Constants.PS_TRACK_RESUME);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, broadcastIntentFilter);
 
     }
 
@@ -269,7 +269,7 @@ public class PlayerFragment extends DialogFragment {
     public void onPause() {
         Log.d(TAG, "onPause ");
         super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(intentReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
 
@@ -309,7 +309,7 @@ public class PlayerFragment extends DialogFragment {
 */
 /*
                 if (mPlayerService != null) {
-                    currentTime = mPlayerService.getCurrentPosition();
+                    currentTime = mPlayerService.getCurrentTime();
                     mSeekBar.setProgress(currentTime);
 
                     durationHandler.post(new Runnable() {
@@ -335,7 +335,7 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void run() {
                 if (mPlayerService != null) {
-                    int currentTime = mPlayerService.getCurrentPosition();
+                    int currentTime = mPlayerService.getCurrentTime();
                     mCurrentTime.setText(msToMinSec(currentTime));
                     mSeekBar.setProgress(currentTime);
                     durationHandler.postDelayed(this, 1000);
@@ -350,7 +350,7 @@ public class PlayerFragment extends DialogFragment {
     private void updateProgress() {
         Log.d(TAG, "updateProgress ");
         if (mPlayerService != null) {
-            int currentTime = mPlayerService.getCurrentPosition();
+            int currentTime = mPlayerService.getCurrentTime();
             mSeekBar.setProgress(currentTime);
             mCurrentTime.setText(msToMinSec(currentTime));
         }
@@ -373,11 +373,11 @@ public class PlayerFragment extends DialogFragment {
         mTrackNumber = mPlayerService.getTrackNumber();
 
         if (mPlayerService != null & mPlayerService.isPlaying()) {
-            int totalDuration = mPlayerService.getDuration();
+            int totalDuration = mPlayerService.getTotalDuration();
             mSeekBar.setMax(totalDuration);
             mTotalDuration.setText(msToMinSec(totalDuration));
 
-            int currentTime = mPlayerService.getCurrentPosition();
+            int currentTime = mPlayerService.getCurrentTime();
             mCurrentTime.setText(msToMinSec(currentTime));
         }
 
@@ -391,7 +391,7 @@ public class PlayerFragment extends DialogFragment {
         }
 */
 
-        if (mTrackNumber == 0) {
+        if (mPlayerService.isFirstTrack()) {
             mPreviousButton.setEnabled(false);
             mPreviousButton.setClickable(false);
             mPreviousButton.setVisibility(View.INVISIBLE);
@@ -401,7 +401,13 @@ public class PlayerFragment extends DialogFragment {
             mPreviousButton.setVisibility(View.VISIBLE);
         }
 
-        if (mTrackNumber == mTracks.size() - 1) {
+        if (mPlayerService.isPlaying()) {
+            mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+        } else {
+            mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+        }
+
+        if (mPlayerService.isLastTrack()) {
             mNextButton.setEnabled(false);
             mNextButton.setClickable(false);
             mNextButton.setVisibility(View.INVISIBLE);
@@ -440,7 +446,7 @@ public class PlayerFragment extends DialogFragment {
     }
 
 
-    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -451,12 +457,13 @@ public class PlayerFragment extends DialogFragment {
                 updateTrackDisplay();
             } else if (info == Constants.PS_LAST_TRACK_COMPLETED) {
                 Toast.makeText(context, "Play Track completed", Toast.LENGTH_SHORT).show();
+                updateTrackDisplay();
             } else if (info == Constants.PS_TRACK_PAUSE){
                 updateTrackDisplay();
-                mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+                //mPlayButton.setImageResource(android.R.drawable.ic_media_play);
             } else if (info == Constants.PS_TRACK_RESUME) {
                 updateTrackDisplay();
-                mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+                //mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
             }
         }
     };

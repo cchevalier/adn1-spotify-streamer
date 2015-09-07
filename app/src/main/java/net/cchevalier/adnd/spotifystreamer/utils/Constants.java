@@ -11,6 +11,8 @@ public class Constants {
     static final String ACTION_TIMETRAVEL = "com.example.action.TIMETRAVEL";
     */
 
+    // PlayerService
+    //
     // Intents ACTION "net.cchevalier.adnd.spotifystreamer"
     public final static String ACTION_CONNECT = "net.cchevalier.adnd.spotifystreamer.ACTION_CONNECT";
     public final static String ACTION_START = "net.cchevalier.adnd.spotifystreamer.ACTION_START";
