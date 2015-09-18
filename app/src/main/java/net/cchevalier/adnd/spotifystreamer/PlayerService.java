@@ -87,7 +87,7 @@ public class PlayerService extends Service implements
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind ");
-        return false;
+        return true;
     }
 
 
@@ -110,9 +110,9 @@ public class PlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        return super.onStartCommand(intent, flags, startId);
 
-        if (intent == null | intent.getAction() == null) {
-            return START_STICKY;
-        }
+        //if (intent == null | intent.getAction() == null) {
+        //    return START_STICKY;
+        //}
 
         if (intent.getAction() == Constants.ACTION_START) {
 
@@ -179,10 +179,8 @@ public class PlayerService extends Service implements
     @Override
     public void onPrepared(MediaPlayer mp) {
         Log.d(TAG, "onPrepared ");
+
         mp.start();
-
-        //Toast.makeText(getApplicationContext(), "Now playing..." + mCurrentTrack.name, Toast.LENGTH_SHORT).show();
-
         sendBroadcastInfo(Constants.PS_NEW_TRACK_STARTED);
         updateNotification();
 
@@ -192,12 +190,12 @@ public class PlayerService extends Service implements
     private void updateNotification() {
         // Create a notification area that get user back to the PlayerActivity (UI)
 
-        // Display Player Intent
+        // Display Player Intent to navigate back to Player UI from notification
         final Intent displayPlayerIntent = new Intent(getApplicationContext(), PlayerActivity.class);
         displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
         final PendingIntent displayPlayerPendingIntent = PendingIntent.getActivity(this, 0, displayPlayerIntent, 0);
 
-        // Building base notification
+        // Build base notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setOngoing(true)
@@ -223,6 +221,7 @@ public class PlayerService extends Service implements
         remoteViews.setTextColor(R.id.notification_artist_name, getResources().getColor(android.R.color.black));
 
         notification.contentView = remoteViews;
+
 
         //
         // RemoteViews for (big) contentView (with controls based on user prefs)
@@ -306,8 +305,10 @@ public class PlayerService extends Service implements
             Toast.makeText(getApplicationContext(), "Playlist ended", Toast.LENGTH_SHORT).show();
             sendBroadcastInfo(Constants.PS_LAST_TRACK_COMPLETED);
             updateNotification();
+            stopForeground(false);
 
-            stopSelf();
+            // Commented next line in order to avoid crash when last track completed + rotation
+            //stopSelf();
         }
     }
 
@@ -380,7 +381,9 @@ public class PlayerService extends Service implements
 
 
     public boolean isPlaying() {
-        return mMediaPlayer.isPlaying();
+        if (mMediaPlayer != null) {
+            return mMediaPlayer.isPlaying();
+        } else return false;
     }
 
     public boolean isFirstTrack() {
