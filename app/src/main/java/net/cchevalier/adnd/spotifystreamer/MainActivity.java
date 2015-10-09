@@ -7,11 +7,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.PlayerFragment;
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity
         implements ArtistFragment.Callbacks, TracksFragment.Callbacks {
 
     private final String TAG = "MAIN_ACT";
+
+    private ShareActionProvider mShareActionProvider;
 
     private boolean mUiTablet;
 
@@ -130,11 +133,31 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu ");
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Locate MenuItem with ShareActionProvider
+        MenuItem item = menu.findItem(R.id.action_share);
+
+        // Fetch and store ShareActionProvider
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareTrackIntent());
+        }
+
         return true;
     }
 
+
+    private Intent createShareTrackIntent(){
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Now playing...");
+        return shareIntent;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -149,7 +172,9 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_share:
-                Toast.makeText(this, "Share on the way...", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Share on the way...", Toast.LENGTH_SHORT).show();
+
+
                 return true;
 
             case R.id.action_now_playing:
