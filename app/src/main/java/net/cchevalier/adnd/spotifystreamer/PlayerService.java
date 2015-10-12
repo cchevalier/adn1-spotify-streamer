@@ -46,7 +46,6 @@ public class PlayerService extends Service implements
 
     private MediaPlayer mMediaPlayer = null;
 
-
     private final IBinder mPlayerBind = new PlayerBinder();
 
     private static final int NOTIFICATION_ID = 1;
@@ -108,6 +107,7 @@ public class PlayerService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
 //        return super.onStartCommand(intent, flags, startId);
 
         //if (intent == null | intent.getAction() == null) {
@@ -115,6 +115,7 @@ public class PlayerService extends Service implements
         //}
 
         if (intent.getAction() == Constants.ACTION_START) {
+            Log.d(TAG, "onStartCommand: ACTION_START");
 
             if (mMediaPlayer == null) {
                 mMediaPlayer = new MediaPlayer();
@@ -129,14 +130,17 @@ public class PlayerService extends Service implements
         }
 
         if (intent.getAction() == Constants.ACTION_PLAY_PREVIOUS) {
+            Log.d(TAG, "onStartCommand: ACTION_PLAY_PREVIOUS");
             playPrevious();
         }
 
         if (intent.getAction() == Constants.ACTION_PLAY_NEXT) {
+            Log.d(TAG, "onStartCommand: ACTION_PLAY_NEXT");
             playNext();
         }
 
         if (intent.getAction() == Constants.ACTION_PLAY_PAUSE) {
+            Log.d(TAG, "onStartCommand: ACTION_PLAY_PAUSE");
             if (isPlaying()) {
                 pause();
             } else {

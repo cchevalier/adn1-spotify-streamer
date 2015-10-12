@@ -56,10 +56,10 @@ public class TracksFragment extends Fragment {
     }
 
 
-    public TracksFragment() {
-        Log.d(TAG, "TracksFragment ");
-
-    }
+    //public TracksFragment() {
+    //    Log.d(TAG, "TracksFragment ");
+    //
+    //}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,6 +109,7 @@ public class TracksFragment extends Fragment {
         mTrackListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "Track: onItemClick");
 
 /*
                 // Stage 1: display toast instead of launching mediaPlayer

@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
 
     private PlayerService mPlayerService;
     private boolean mPlayerServiceBound;
+
     private ServiceConnection playerServiceConnection = new ServiceConnection() {
 
         @Override
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity
             PlayerService.PlayerBinder binder = (PlayerService.PlayerBinder)service;
             mPlayerService = binder.getService();
             mPlayerServiceBound = true;
-
         }
 
         @Override
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity
 
             mPlayerServiceBound = false;
         }
-
     };
 
 
@@ -70,8 +69,15 @@ public class MainActivity extends AppCompatActivity
         String country_code = prefs.getString(getString(R.string.pref_country_key), "unknown");
         Log.d(TAG, "onCreateView / country = " + country_code);
 
+        // Connect to PlayerService
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        playerServiceIntent.setAction(Constants.ACTION_CONNECT);
+        bindService(playerServiceIntent, playerServiceConnection, BIND_AUTO_CREATE);
+
+        //
         setContentView(R.layout.activity_main);
 
+        //
         mUiTablet = findViewById(R.id.container_fragment_tracks) != null;
     }
 
@@ -79,19 +85,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart ");
-
         super.onStart();
-
-        Intent playerServiceIntent = new Intent(this, PlayerService.class);
-        playerServiceIntent.setAction(Constants.ACTION_CONNECT);
-        bindService(playerServiceIntent, playerServiceConnection, BIND_AUTO_CREATE);
     }
 
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume ");
-
         super.onResume();
     }
 
@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause ");
-
         super.onPause();
     }
 
@@ -107,7 +106,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop ");
-
         super.onStop();
     }
 
@@ -115,7 +113,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestart() {
         Log.d(TAG, "onRestart ");
-
         super.onRestart();
     }
 

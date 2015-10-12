@@ -14,7 +14,7 @@
         android:title="@string/action_now_playing"
         android:icon="@android:drawable/ic_media_play"
         android:orderInCategory="80"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always"
         />
 
@@ -22,7 +22,7 @@
         android:id="@+id/action_share"
         android:title="@string/action_share"
         android:orderInCategory="80"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always"
         app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
         />

@@ -245,6 +245,25 @@ public class PlayerFragment extends DialogFragment {
 
     }
 
+    //
+    // How to properly retain a DialogFragment through rotation?
+    // http://stackoverflow.com/questions/14657490/how-to-properly-retain-a-dialogfragment-through-rotation
+    //
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    //
+    // How to properly retain a DialogFragment through rotation?
+    // http://stackoverflow.com/questions/14657490/how-to-properly-retain-a-dialogfragment-through-rotation
+    //
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance())
+            getDialog().setDismissMessage(null);
+        super.onDestroyView();
+    }
 
     @Override
     public void onPause() {
@@ -286,6 +305,7 @@ public class PlayerFragment extends DialogFragment {
 
     private void updateProgress() {
         Log.d(TAG, "updateProgress ");
+
 
         if (mPlayerService != null) {
             int currentTime = mPlayerService.getCurrentTime();
