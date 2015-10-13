@@ -29,10 +29,13 @@ public class MainActivity extends AppCompatActivity
 
     private final String TAG = "MAIN_ACT";
 
+    private MenuItem menuNowPlaying;
+    private MenuItem menuShare;
     private ShareActionProvider mShareActionProvider;
 
     private boolean mUiTablet;
 
+    // PlayerService stuff
     private PlayerService mPlayerService;
     private boolean mPlayerServiceBound;
 
@@ -45,12 +48,14 @@ public class MainActivity extends AppCompatActivity
             PlayerService.PlayerBinder binder = (PlayerService.PlayerBinder)service;
             mPlayerService = binder.getService();
             mPlayerServiceBound = true;
+            if (menuNowPlaying != null) {
+                updateOptionsMenu();
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "onServiceDisconnected ");
-
             mPlayerServiceBound = false;
         }
     };
@@ -114,6 +119,7 @@ public class MainActivity extends AppCompatActivity
     protected void onRestart() {
         Log.d(TAG, "onRestart ");
         super.onRestart();
+        updateOptionsMenu();
     }
 
 
@@ -134,17 +140,35 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        // Locate MenuItem with ShareActionProvider
-        MenuItem item = menu.findItem(R.id.action_share);
+
+        // Locate Now Playing MenuItem
+        menuNowPlaying = menu.findItem(R.id.action_now_playing);
+
+        // Locate Share MenuItem
+        menuShare = menu.findItem(R.id.action_share);
 
         // Fetch and store ShareActionProvider
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShare);
 
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareTrackIntent());
-        }
+        updateOptionsMenu();
 
         return true;
+    }
+
+    private void updateOptionsMenu() {
+        Log.d(TAG, "updateOptionsMenu");
+        if (mPlayerServiceBound & mPlayerService.isPlaying()) {
+
+            menuNowPlaying.setVisible(true);
+            menuShare.setVisible(true);
+
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(createShareTrackIntent());
+            }
+        } else {
+            menuNowPlaying.setVisible(false);
+            menuShare.setVisible(false);
+        }
     }
 
 
@@ -243,6 +267,7 @@ public class MainActivity extends AppCompatActivity
         arguments.putInt(TracksFragment.KEY_POSITION, position);
         playerFragment.setArguments(arguments);
 */
+        updateOptionsMenu();
 
         PlayerFragment playerFragment = new PlayerFragment();
         playerFragment.show(getFragmentManager(), "dialog");

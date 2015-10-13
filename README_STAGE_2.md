@@ -4,7 +4,7 @@
 
 #### User Interface - Function
 
-App displays a “Now Playing” Button in the ActionBar that serves to reopen the player UI should the user navigate back to browse content and then want to resume control over playback.
+- App displays a “Now Playing” Button in the ActionBar that serves to reopen the player UI should the user navigate back to browse content and then want to resume control over playback.
 
 #### Notifications
 
