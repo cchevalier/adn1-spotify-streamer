@@ -33,6 +33,7 @@ import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -364,7 +365,7 @@ public class PlayerFragment extends DialogFragment {
             mNextButton.setVisibility(View.VISIBLE);
         }
 
-        if (mCurrentTrack.UrlLargeImage != null && mCurrentTrack.UrlLargeImage != "") {
+        if (mCurrentTrack.UrlLargeImage != null && !mCurrentTrack.UrlLargeImage.equals("")) {
             Picasso.with(getActivity())
                     .load(mCurrentTrack.UrlLargeImage)
                     .resize(300, 300)
@@ -401,19 +402,19 @@ public class PlayerFragment extends DialogFragment {
             String info = intent.getAction();
             Log.d(TAG, "onReceive " + info);
 
-            if (info == Constants.PS_NEW_TRACK_STARTED) {
+            if (info.equals(Constants.PS_NEW_TRACK_STARTED)) {
                 Toast.makeText(context, "New Track started", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }
-            else if (info == Constants.PS_LAST_TRACK_COMPLETED) {
+            else if (info.equals(Constants.PS_LAST_TRACK_COMPLETED)) {
                 Toast.makeText(context, "Last Track completed", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }
-            else if (info == Constants.PS_TRACK_PAUSE){
+            else if (info.equals(Constants.PS_TRACK_PAUSE)){
                 Toast.makeText(context, "Current Track paused", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }
-            else if (info == Constants.PS_TRACK_RESUME) {
+            else if (Objects.equals(info, Constants.PS_TRACK_RESUME)) {
                 Toast.makeText(context, "Current Track resumed", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }

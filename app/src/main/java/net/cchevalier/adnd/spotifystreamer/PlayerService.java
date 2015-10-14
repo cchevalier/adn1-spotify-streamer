@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * PlayerService
+ *
  * Created by cch on 19/08/2015.
  */
 public class PlayerService extends Service implements
@@ -36,7 +38,9 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-    private final String TAG = "PLAY_SERVICE";
+    private final String TAG = "SERVICE_PLAYER";
+
+    private static final int NOTIFICATION_ID = 1;
 
     // Tracks settings
     private MyArtist mArtist;
@@ -44,16 +48,14 @@ public class PlayerService extends Service implements
     private int mTrackNumber;
     private MyTrack mCurrentTrack;
 
+
     private MediaPlayer mMediaPlayer = null;
 
+
+    // Binder
     private final IBinder mPlayerBind = new PlayerBinder();
 
-    private static final int NOTIFICATION_ID = 1;
-
-
-
     public class PlayerBinder extends Binder {
-
         public PlayerService getService() {
             Log.d(TAG, "PlayerBinder.getService ");
             return PlayerService.this;
@@ -76,7 +78,6 @@ public class PlayerService extends Service implements
         return mPlayerBind;
     }
 
-
     @Override
     public void onRebind(Intent intent) {
         Log.d(TAG, "onRebind ");
@@ -94,27 +95,13 @@ public class PlayerService extends Service implements
     public void onCreate() {
         Log.d(TAG, "onCreate ");
         super.onCreate();
-
-        /*
-        if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
-            initMediaPlayer();
-        }
-        */
-
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
-//        return super.onStartCommand(intent, flags, startId);
 
-        //if (intent == null | intent.getAction() == null) {
-        //    return START_STICKY;
-        //}
-
-        if (intent.getAction() == Constants.ACTION_START) {
+        if (intent.getAction().equals(Constants.ACTION_START)) {
             Log.d(TAG, "onStartCommand: ACTION_START");
 
             if (mMediaPlayer == null) {
@@ -129,17 +116,17 @@ public class PlayerService extends Service implements
             playTrack();
         }
 
-        if (intent.getAction() == Constants.ACTION_PLAY_PREVIOUS) {
+        if (intent.getAction().equals(Constants.ACTION_PLAY_PREVIOUS)) {
             Log.d(TAG, "onStartCommand: ACTION_PLAY_PREVIOUS");
             playPrevious();
         }
 
-        if (intent.getAction() == Constants.ACTION_PLAY_NEXT) {
+        if (intent.getAction().equals(Constants.ACTION_PLAY_NEXT)) {
             Log.d(TAG, "onStartCommand: ACTION_PLAY_NEXT");
             playNext();
         }
 
-        if (intent.getAction() == Constants.ACTION_PLAY_PAUSE) {
+        if (intent.getAction().equals(Constants.ACTION_PLAY_PAUSE)) {
             Log.d(TAG, "onStartCommand: ACTION_PLAY_PAUSE");
             if (isPlaying()) {
                 pause();
@@ -150,6 +137,7 @@ public class PlayerService extends Service implements
 
         return START_STICKY;
     }
+
 
     public void initMediaPlayer() {
         Log.d(TAG, "initMediaPlayer ");
