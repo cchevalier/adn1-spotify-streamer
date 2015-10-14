@@ -200,9 +200,17 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.action_now_playing:
                 if (mPlayerService.isPlaying()) {
-                    final Intent displayPlayerIntent = new Intent(this, PlayerActivity.class);
-                    displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
-                    startActivity(displayPlayerIntent);
+
+                    if (mUiTablet) {
+                        PlayerFragment playerFragment = new PlayerFragment();
+                        playerFragment.show(getFragmentManager(), "dialog");
+
+                    } else {
+                        final Intent displayPlayerIntent = new Intent(this, PlayerActivity.class);
+                        displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
+                        startActivity(displayPlayerIntent);
+                    }
+
 
                 }
 

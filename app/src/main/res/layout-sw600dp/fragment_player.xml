@@ -16,11 +16,11 @@
         tools:text="Artist"
         android:id="@+id/mp_artist"
 
-        android:layout_width="wrap_content"
+        android:layout_width="500dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:padding="5dp"
-        />
+        android:gravity="center"/>
 
     <TextView
         tools:text="Album"

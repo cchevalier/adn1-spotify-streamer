@@ -31,6 +31,10 @@ import java.util.ArrayList;
 /**
  * PlayerService
  *
+ *
+ *      Display Notification via updateNotification()
+ *      Broadcast status info via sendBroadcastInfo()
+ *
  * Created by cch on 19/08/2015.
  */
 public class PlayerService extends Service implements
@@ -38,7 +42,7 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-    private final String TAG = "SERVICE_PLAYER";
+    private final String TAG = "PLAYER_SERVICE";
 
     private static final int NOTIFICATION_ID = 1;
 
@@ -175,9 +179,8 @@ public class PlayerService extends Service implements
         mp.start();
         sendBroadcastInfo(Constants.PS_NEW_TRACK_STARTED);
         updateNotification();
-
-
     }
+
 
     private void updateNotification() {
         // Create a notification area that get user back to the PlayerActivity (UI)

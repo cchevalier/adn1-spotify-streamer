@@ -41,6 +41,7 @@ public class ArtistFragment extends Fragment {
 
     private EditText mSearchView;
     private ListView mListArtistView;
+    private TextView mInvalidSearchMessage;
 
     private ArtistAdapter mArtistAdapter;
 
@@ -82,6 +83,8 @@ public class ArtistFragment extends Fragment {
         mListArtistView = (ListView) rootView.findViewById(R.id.listview_artist);
         mArtistAdapter = new ArtistAdapter(getActivity(), mArtistsFound);
         mListArtistView.setAdapter(mArtistAdapter);
+
+        mInvalidSearchMessage = (TextView) rootView.findViewById(R.id.no_artist);
 
 
         // Launching search using setOnEditorActionListener
@@ -190,6 +193,7 @@ public class ArtistFragment extends Fragment {
     protected void onPreExecute() {
         super.onPreExecute();
         mFetchErrorFlag = false;
+        mInvalidSearchMessage.setVisibility(View.GONE);
         mArtistAdapter.clear();
     }
 
@@ -198,6 +202,8 @@ public class ArtistFragment extends Fragment {
         protected void onPostExecute(ArrayList<MyArtist> artists) {
 
             if (mFetchErrorFlag){
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -206,9 +212,12 @@ public class ArtistFragment extends Fragment {
             }
 
             if (artists == null || artists.isEmpty()) {
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(), "No artist found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
+
             } else {
                 mArtistsFound = artists;
                 mArtistAdapter.addAll(artists);

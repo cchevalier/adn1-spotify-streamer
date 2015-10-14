@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 public class PlayerActivity extends AppCompatActivity {
 
-    private final String TAG = "PLAY_ACT";
+    private final String TAG = "PLAYER_ACTIVITY";
 
 
     @Override

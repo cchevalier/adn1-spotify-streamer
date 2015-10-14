@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.PlayerActivity;
@@ -46,6 +47,7 @@ public class TracksFragment extends Fragment {
     String mArtistId = "";
 
     private ListView mTrackListView;
+    private TextView mInvalidSearchMessage;
 
     private TrackAdapter mTrackAdapter;
 
@@ -96,6 +98,8 @@ public class TracksFragment extends Fragment {
         if (savedInstanceState != null) {
             mTracksFound = savedInstanceState.getParcelableArrayList(Constants.EXTRA_TRACKS);
         }
+
+        mInvalidSearchMessage = (TextView) rootView.findViewById(R.id.no_track);
 
         // Retrieve mTrackListView
         mTrackListView = (ListView) rootView.findViewById(R.id.listview_tracks);
@@ -220,6 +224,7 @@ public class TracksFragment extends Fragment {
             super.onPreExecute();
             mFetchErrorFlag = false;
             mTrackAdapter.clear();
+            mInvalidSearchMessage.setVisibility(View.GONE);
         }
 
         @Override
@@ -227,6 +232,8 @@ public class TracksFragment extends Fragment {
 //            super.onPostExecute(tracks);
 
             if (mFetchErrorFlag){
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching track data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -235,6 +242,8 @@ public class TracksFragment extends Fragment {
             }
 
             if (tracks == null || tracks.isEmpty()) {
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(), " No track found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();

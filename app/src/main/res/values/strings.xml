@@ -21,6 +21,8 @@
     <!-- -->
     <string name="search_header">Search for:</string>
     <string name="artist_name">Artist\'s name</string>
+    <string name="no_artist">No artist found.</string>
+    <string name="no_track">No track found.</string>
 
     <!-- -->
     <string name="title_activity_tracks">Top 10 Tracks</string>
