@@ -4,38 +4,40 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import net.cchevalier.adnd.spotifystreamer.fragments.ArtistFragment;
 import net.cchevalier.adnd.spotifystreamer.fragments.TracksFragment;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 
 public class TracksActivity extends AppCompatActivity {
 
-    private static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
+    private final String TAG = "TRACKS_ACT";
 
-    public static final String KEY_TABLET = "KEY_TABLET";
-    private boolean mTwoPane = false;
+    private boolean mUiTablet = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracks);
 
         String artistName = "";
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
+        if (intent != null && intent.hasExtra(Constants.EXTRA_ARTIST)) {
 
-            MyArtist artist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
+            MyArtist artist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
             artistName = artist.name;
 
             Bundle arguments = new Bundle();
-            arguments.putBoolean(KEY_TABLET, mTwoPane);
-            arguments.putParcelable(ArtistFragment.KEY_ARTIST_SELECTED, artist);
+            arguments.putBoolean(Constants.EXTRA_IS_TABLET, mUiTablet);
+            arguments.putParcelable(Constants.EXTRA_ARTIST, artist);
 
             TracksFragment tracksFragment = new TracksFragment();
             tracksFragment.setArguments(arguments);
@@ -46,7 +48,7 @@ public class TracksActivity extends AppCompatActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setSubtitle(artistName);
         }
@@ -69,6 +71,7 @@ public class TracksActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

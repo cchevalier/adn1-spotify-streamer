@@ -2,22 +2,28 @@ package net.cchevalier.adnd.spotifystreamer.fragments;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.cchevalier.adnd.spotifystreamer.PlayerActivity;
+import net.cchevalier.adnd.spotifystreamer.PlayerService;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.adapters.TrackAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
 import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,41 +40,41 @@ import retrofit.RetrofitError;
  */
 public class TracksFragment extends Fragment {
 
-    public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
-    public static final String KEY_TRACKS_FOUND = "KEY_TRACKS_FOUND";
-    public static final String KEY_POSITION = "KEY_POSITION";
-    public static final String KEY_TABLET = "KEY_TABLET";
+    private final String TAG = "TRACKS_FRAG";
+
+    private MyArtist mArtist = null;
+    private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
+    String mArtistId = "";
 
     private ListView mTrackListView;
+    private TextView mInvalidSearchMessage;
 
     private TrackAdapter mTrackAdapter;
 
-    private MyArtist mArtist = null;
-    String mArtistId = "";
-    private ArrayList<MyTrack> mTracksFound = new ArrayList<>();
-
-    private boolean mTwoPane = false;
+    private boolean mUiTablet = false;
 
     public interface Callbacks {
-
         public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position);
     }
 
 
-    public TracksFragment() {
-    }
+    //public TracksFragment() {
+    //    Log.d(TAG, "TracksFragment ");
+    //
+    //}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate ");
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(KEY_ARTIST_SELECTED)) {
-            mArtist = getArguments().getParcelable(KEY_ARTIST_SELECTED);
+        if (getArguments().containsKey(Constants.EXTRA_ARTIST)) {
+            mArtist = getArguments().getParcelable(Constants.EXTRA_ARTIST);
+            mArtistId = mArtist.id;
         }
-        mArtistId = mArtist.id;
 
-        if (getArguments().containsKey(KEY_TABLET)) {
-            mTwoPane = getArguments().getBoolean(KEY_TABLET);
+        if (getArguments().containsKey(Constants.EXTRA_IS_TABLET)) {
+            mUiTablet = getArguments().getBoolean(Constants.EXTRA_IS_TABLET);
         }
 
     }
@@ -76,11 +82,12 @@ public class TracksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView ");
+
         View rootView =  inflater.inflate(R.layout.fragment_tracks, container, false);
 
-        // Handling of intent
-
 /*
+        // Handling of intent
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(KEY_ARTIST_SELECTED)) {
             mArtist = intent.getParcelableExtra(KEY_ARTIST_SELECTED);
@@ -89,8 +96,10 @@ public class TracksFragment extends Fragment {
 */
 
         if (savedInstanceState != null) {
-            mTracksFound = savedInstanceState.getParcelableArrayList(KEY_TRACKS_FOUND);
+            mTracksFound = savedInstanceState.getParcelableArrayList(Constants.EXTRA_TRACKS);
         }
+
+        mInvalidSearchMessage = (TextView) rootView.findViewById(R.id.no_track);
 
         // Retrieve mTrackListView
         mTrackListView = (ListView) rootView.findViewById(R.id.listview_tracks);
@@ -104,9 +113,10 @@ public class TracksFragment extends Fragment {
         mTrackListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "Track: onItemClick");
 
-                // Stage 1: display toast instead of launching mediaPlayer
 /*
+                // Stage 1: display toast instead of launching mediaPlayer
                 MyTrack selectedTrack = mTrackAdapter.getItem(position);
                 String display = "Stage 2:\nWill launch player for track\n" + selectedTrack.name;
                 Toast toast = Toast.makeText(getActivity(), display, Toast.LENGTH_SHORT);
@@ -115,43 +125,52 @@ public class TracksFragment extends Fragment {
 */
 
                 // Stage 2: launch PlayerActivity
-
-                if (mTwoPane) {
-
+                if (mUiTablet) {
                     ((Callbacks) getActivity()).onTrackSelected(mArtist, mTracksFound, position);
+                } else {
+                    Intent playerServiceIntent = new Intent(getActivity(), PlayerService.class);
+                    playerServiceIntent.setAction(Constants.ACTION_START);
+                    playerServiceIntent.putExtra(Constants.EXTRA_ARTIST, mArtist);
+                    playerServiceIntent.putParcelableArrayListExtra(Constants.EXTRA_TRACKS, mTracksFound);
+                    playerServiceIntent.putExtra(Constants.EXTRA_TRACK_NB, position);
+                    getActivity().startService(playerServiceIntent);
 
-//                    playerFragment.show(getSupportFragmentManager(), "dialog");
-
-
-                }
-                else {
                     Intent intent = new Intent(getActivity(), PlayerActivity.class);
-                    intent.putExtra(KEY_ARTIST_SELECTED, mArtist);
-                    intent.putParcelableArrayListExtra(KEY_TRACKS_FOUND, mTracksFound);
-                    intent.putExtra(KEY_POSITION, position);
-
+                    intent.putExtra(Constants.EXTRA_ARTIST, mArtist);
+                    intent.putParcelableArrayListExtra(Constants.EXTRA_TRACKS, mTracksFound);
+                    intent.putExtra(Constants.EXTRA_TRACK_NB, position);
                     startActivity(intent);
-                }
 
+
+                }
             }
-        });
+            });
 
         if (mTracksFound.isEmpty()) {
-            // Launch tracks search as AsyncTask with country = DK (hardcoded)
+
+            // Retrieve country defined by user (DK is default)
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String country_code = prefs.getString(getString(R.string.pref_country_key), "DK");
+            Log.d(TAG, "onCreateView / country = " + country_code);
+
+            // Launch tracks search as AsyncTask with country from Preferences
             SearchSpotifyForTopTrack task = new SearchSpotifyForTopTrack();
-            task.execute(mArtistId, "DK");
+
+
+            task.execute(mArtistId, country_code);
         }
 
         return rootView;
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState ");
         // our own data to preserve
-        outState.putParcelableArrayList(KEY_TRACKS_FOUND, mTracksFound);
+        outState.putParcelableArrayList(Constants.EXTRA_TRACKS, mTracksFound);
         super.onSaveInstanceState(outState);
     }
-
 
 
 
@@ -205,13 +224,17 @@ public class TracksFragment extends Fragment {
             super.onPreExecute();
             mFetchErrorFlag = false;
             mTrackAdapter.clear();
+            mInvalidSearchMessage.setVisibility(View.GONE);
         }
+
 
         @Override
         protected void onPostExecute(ArrayList<MyTrack> tracks) {
 //            super.onPostExecute(tracks);
 
             if (mFetchErrorFlag){
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching track data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -220,6 +243,7 @@ public class TracksFragment extends Fragment {
             }
 
             if (tracks == null || tracks.isEmpty()) {
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
                 Toast toast = Toast.makeText(getActivity(), " No track found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();

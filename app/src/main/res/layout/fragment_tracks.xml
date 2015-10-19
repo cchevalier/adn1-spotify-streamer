@@ -16,6 +16,15 @@
         android:layout_height="wrap_content"
         tools:text="Selected artist Top Tracks:"/>
 -->
+    <TextView
+        android:id="@+id/no_track"
+        android:text="@string/no_track"
+        android:paddingTop="40dp"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        />
 
     <ListView
         android:id="@+id/listview_tracks"

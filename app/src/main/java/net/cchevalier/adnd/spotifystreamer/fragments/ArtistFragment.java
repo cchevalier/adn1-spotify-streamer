@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ import android.widget.Toast;
 import net.cchevalier.adnd.spotifystreamer.R;
 import net.cchevalier.adnd.spotifystreamer.adapters.ArtistAdapter;
 import net.cchevalier.adnd.spotifystreamer.models.MyArtist;
+import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -36,22 +36,20 @@ import retrofit.RetrofitError;
  */
 public class ArtistFragment extends Fragment {
 
-    private static final String KEY_SEARCH_STRING = "KEY_SEARCH_STRING";
-    private static final String KEY_ARTISTS_FOUND = "KEY_ARTISTS_FOUND";
-    public static final String KEY_ARTIST_SELECTED = "KEY_ARTIST_SELECTED";
-
-    private EditText mSearchView;
-    private ListView mListArtistView;
-
-    private ArtistAdapter mArtistAdapter;
-
     private String mSearchString;
     private ArrayList<MyArtist> mArtistsFound;
 
-    public interface Callbacks {
+    private EditText mSearchView;
+    private ListView mListArtistView;
+    private TextView mInvalidSearchMessage;
 
+    private ArtistAdapter mArtistAdapter;
+
+
+    public interface Callbacks {
         public void onArtistSelected(MyArtist selectedArtist);
     }
+
 
     public ArtistFragment() {
     }
@@ -62,13 +60,14 @@ public class ArtistFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mSearchString = savedInstanceState.getString(KEY_SEARCH_STRING);
-            mArtistsFound = savedInstanceState.getParcelableArrayList(KEY_ARTISTS_FOUND);
+            mSearchString = savedInstanceState.getString(Constants.EXTRA_SEARCH_STRING);
+            mArtistsFound = savedInstanceState.getParcelableArrayList(Constants.EXTRA_ARTIST);
         } else {
             mSearchString = "";
             mArtistsFound = new ArrayList<>();
         }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,6 +84,8 @@ public class ArtistFragment extends Fragment {
         mArtistAdapter = new ArtistAdapter(getActivity(), mArtistsFound);
         mListArtistView.setAdapter(mArtistAdapter);
 
+        mInvalidSearchMessage = (TextView) rootView.findViewById(R.id.no_artist);
+
 
         // Launching search using setOnEditorActionListener
         mSearchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -93,7 +94,6 @@ public class ArtistFragment extends Fragment {
                 boolean handled = false;
 
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-
                     mSearchString = mSearchView.getText().toString();
 
                     // Hide the kb
@@ -104,9 +104,9 @@ public class ArtistFragment extends Fragment {
                     // Launch search as AsyncTask
                     SearchSpotifyForArtist task = new SearchSpotifyForArtist();
                     task.execute(mSearchString);
-
                     handled = true;
                 }
+
                 return handled;
             }
         });
@@ -116,17 +116,9 @@ public class ArtistFragment extends Fragment {
         mListArtistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 MyArtist selectedArtist = mArtistAdapter.getItem(position);
-
                 ((Callbacks) getActivity()).onArtistSelected(selectedArtist);
 
-                // Start TracksActivity
-/*
-                Intent intent = new Intent(getActivity(), TracksActivity.class);
-                intent.putExtra(KEY_ARTIST_SELECTED, selectedArtist);
-                startActivity(intent);
-*/
             }
         });
 
@@ -136,10 +128,9 @@ public class ArtistFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
         // our own data to preserve
-        outState.putString(KEY_SEARCH_STRING, mSearchString);
-        outState.putParcelableArrayList(KEY_ARTISTS_FOUND, mArtistsFound);
+        outState.putString(Constants.EXTRA_SEARCH_STRING, mSearchString);
+        outState.putParcelableArrayList(Constants.EXTRA_ARTIST, mArtistsFound);
 
         super.onSaveInstanceState(outState);
     }
@@ -182,14 +173,16 @@ public class ArtistFragment extends Fragment {
             for (int i = 0; i < count; i++) {
                 Artist artist = resultsArtists.artists.items.get(i);
                 artists.add(new MyArtist(artist));
-
+/*
+                // Logging
                 Log.i("SAPI", i + " " + artist.name);
-//                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
-//                Log.i("SAPI", i + "   id: " + artist.id);
-//                Log.i("SAPI", i + "  uri: " + artist.uri);
+                Log.i("SAPI", i + "  pop:" + artist.popularity.toString());
+                Log.i("SAPI", i + "   id: " + artist.id);
+                Log.i("SAPI", i + "  uri: " + artist.uri);
                 if (artist.images.size() > 0) {
                     Log.i("SAPI", i + "  url: " + artist.images.get(0).url);
                 }
+*/
             }
 
             return artists;
@@ -200,6 +193,7 @@ public class ArtistFragment extends Fragment {
     protected void onPreExecute() {
         super.onPreExecute();
         mFetchErrorFlag = false;
+        mInvalidSearchMessage.setVisibility(View.GONE);
         mArtistAdapter.clear();
     }
 
@@ -208,6 +202,8 @@ public class ArtistFragment extends Fragment {
         protected void onPostExecute(ArrayList<MyArtist> artists) {
 
             if (mFetchErrorFlag){
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(),
                         "Error fetching data.\nPlease check your \nnetwork connection. ", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -216,9 +212,12 @@ public class ArtistFragment extends Fragment {
             }
 
             if (artists == null || artists.isEmpty()) {
+                mInvalidSearchMessage.setVisibility(View.VISIBLE);
+
                 Toast toast = Toast.makeText(getActivity(), "No artist found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
+
             } else {
                 mArtistsFound = artists;
                 mArtistAdapter.addAll(artists);
