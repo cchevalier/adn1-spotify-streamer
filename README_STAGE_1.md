@@ -1,4 +1,4 @@
-# Spotify Streamer
+# Spotify Streamer -  Stage 1
 
 ADnd-P1-SpotifyStreamer : A music streaming application.
 
@@ -6,7 +6,6 @@ by CChevalier, July 2015.
 
 ---
 
-## Stage 1
 
 ## Update for submission stage 1 - attempt 2:
 Thanks to the reviewer for a fast and very valuable review of my first submission.

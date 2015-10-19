@@ -163,6 +163,7 @@ public class TracksFragment extends Fragment {
         return rootView;
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState ");
@@ -170,7 +171,6 @@ public class TracksFragment extends Fragment {
         outState.putParcelableArrayList(Constants.EXTRA_TRACKS, mTracksFound);
         super.onSaveInstanceState(outState);
     }
-
 
 
 
@@ -227,6 +227,7 @@ public class TracksFragment extends Fragment {
             mInvalidSearchMessage.setVisibility(View.GONE);
         }
 
+
         @Override
         protected void onPostExecute(ArrayList<MyTrack> tracks) {
 //            super.onPostExecute(tracks);
@@ -243,7 +244,6 @@ public class TracksFragment extends Fragment {
 
             if (tracks == null || tracks.isEmpty()) {
                 mInvalidSearchMessage.setVisibility(View.VISIBLE);
-
                 Toast toast = Toast.makeText(getActivity(), " No track found", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();

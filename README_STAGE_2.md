@@ -6,6 +6,7 @@ by CChevalier, October 2015.
 
 ---
 
+
 ## Submission 2
 
 ### Optional Components
@@ -30,9 +31,11 @@ by CChevalier, October 2015.
 
 #### Settings Menu
 
-- App has a menu item to select the country code (which is automatically passed into the get Top Tracks query )
+- App has a menu item to select the country code (which is automatically passed into the get Top Tracks query )  
+  _Only 5 countries are implemented but this could be increased easily if needed_
 
-- App has menu item to toggle showing notification controls on the drawer and lock screen
+- App has menu item to toggle showing notification controls on the drawer and lock screen  
+  _This feature is implementing by removing the BigRemoteView (containing media controls) from notifications_  
 
 
    

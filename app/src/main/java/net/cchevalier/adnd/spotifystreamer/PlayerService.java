@@ -43,7 +43,7 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-    private final String TAG = "SERVICE";
+    private final String TAG = "PLAYER_SERVICE";
 
     private NotificationManager mNM;
     private static final int NOTIFICATION_ID = 1789;

@@ -123,8 +123,8 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         Log.d(TAG, "onPause ");
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
 
@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity
     protected void onRestart() {
         Log.d(TAG, "onRestart ");
         super.onRestart();
+
         updateOptionsMenu();
     }
 
@@ -196,7 +197,15 @@ public class MainActivity extends AppCompatActivity
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "Now playing: " + mPlayerService.getCurrentTrack().name);
+
+        MyArtist currentArtist = mPlayerService.getArtist();
+        MyTrack currentTrack = mPlayerService.getCurrentTrack();
+
+        String message = "Now playing:\n" + currentTrack.name;
+        message = message + " by " + currentArtist.name;
+        message = message + "\n" + currentTrack.preview_url;
+        message = message + "\n#Spotify Streamer";
+        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
 
         if (mShareActionProvider != null) {
             mShareActionProvider.setShareIntent(shareIntent);
@@ -247,10 +256,12 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateOptionsMenu();
             String info = intent.getAction();
             Log.d(TAG, "onReceive " + info);
 
+            updateOptionsMenu();
+
+            /*
             if (info.equals(Constants.PS_NEW_TRACK_STARTED)) {
                 Toast.makeText(context, "MAIN: New Track started", Toast.LENGTH_SHORT).show();
             }
@@ -263,9 +274,10 @@ public class MainActivity extends AppCompatActivity
             else if (info.equals(Constants.PS_TRACK_RESUME)) {
                 Toast.makeText(context, "Current Track resumed", Toast.LENGTH_SHORT).show();
             }
-
+            */
         }
     };
+
 
 
     /* ArtistFragment.Callbacks */
@@ -301,14 +313,15 @@ public class MainActivity extends AppCompatActivity
     public void onTrackSelected(MyArtist selectedArtist, ArrayList<MyTrack> TracksFound, int position) {
         Log.d(TAG, "onTrackSelected ");
 
+        // Launch playing of selected track by PlayerService (via startService)
         Intent playerServiceIntent = new Intent(this, PlayerService.class);
         playerServiceIntent.setAction(Constants.ACTION_START);
         playerServiceIntent.putExtra(Constants.EXTRA_ARTIST, selectedArtist);
         playerServiceIntent.putParcelableArrayListExtra(Constants.EXTRA_TRACKS, TracksFound);
         playerServiceIntent.putExtra(Constants.EXTRA_TRACK_NB, position);
-
         startService(playerServiceIntent);
 
+        // Display UI Player as DLG
         PlayerFragment playerFragment = new PlayerFragment();
         playerFragment.show(getFragmentManager(), "dialog");
     }

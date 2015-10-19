@@ -39,7 +39,7 @@ import java.util.ArrayList;
  */
 public class PlayerFragment extends DialogFragment {
     
-    private final String TAG = "PLAY_FRAG";
+    private final String TAG = "PLAYER_FRAGMENT";
 
     private MyArtist mArtist = null;
     private ArrayList<MyTrack> mTracks = null;
@@ -121,9 +121,6 @@ public class PlayerFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        Intent playIntent = new Intent(getActivity(), PlayerService.class);
-        playIntent.setAction(Constants.ACTION_CONNECT);
-        getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -152,6 +149,10 @@ public class PlayerFragment extends DialogFragment {
         mSeekBar.setClickable(false);
         int spotifyDuration = 30000;
         mSeekBar.setMax(spotifyDuration);
+
+        Intent playIntent = new Intent(getActivity(), PlayerService.class);
+        playIntent.setAction(Constants.ACTION_CONNECT);
+        getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
 
         return rootView;
     }
@@ -260,9 +261,9 @@ public class PlayerFragment extends DialogFragment {
 
     @Override
     public void onStop() {
-        //getActivity().unbindService(playerConnection);
-        //mPlayerService = null;
-        //mPlayerBound = false;
+        getActivity().unbindService(playerConnection);
+        mPlayerService = null;
+        mPlayerBound = false;
 
         super.onStop();
     }
@@ -283,9 +284,9 @@ public class PlayerFragment extends DialogFragment {
     public void onDestroy() {
         Log.d(TAG, "onDestroy ");
 
-        getActivity().unbindService(playerConnection);
-        mPlayerService = null;
-        mPlayerBound = false;
+        //getActivity().unbindService(playerConnection);
+        //mPlayerService = null;
+        //mPlayerBound = false;
 
         super.onDestroyView();
     }
