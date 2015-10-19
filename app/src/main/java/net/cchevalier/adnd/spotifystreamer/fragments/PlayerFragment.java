@@ -33,7 +33,6 @@ import net.cchevalier.adnd.spotifystreamer.models.MyTrack;
 import net.cchevalier.adnd.spotifystreamer.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -49,7 +48,6 @@ public class PlayerFragment extends DialogFragment {
 
     // Service
     private PlayerService mPlayerService;
-    private Intent playIntent;
     private boolean mPlayerBound = false;
 
 
@@ -61,18 +59,15 @@ public class PlayerFragment extends DialogFragment {
 
     private TextView mCurrentTime;
     private TextView mTotalDuration;
+    private SeekBar mSeekBar;
 
     private ImageButton mPreviousButton;
     private ImageButton mPlayButton;
     private ImageButton mNextButton;
 
-    private SeekBar mSeekBar;
-
-    private static int spotifyDuration = 30000;
 
     private Handler durationHandler = new Handler();
 
-    private IntentFilter broadcastIntentFilter;
 
 
     //
@@ -126,6 +121,10 @@ public class PlayerFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
+        Intent playIntent = new Intent(getActivity(), PlayerService.class);
+        playIntent.setAction(Constants.ACTION_CONNECT);
+        getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
+
     }
 
 
@@ -151,7 +150,7 @@ public class PlayerFragment extends DialogFragment {
 
         mSeekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
         mSeekBar.setClickable(false);
-
+        int spotifyDuration = 30000;
         mSeekBar.setMax(spotifyDuration);
 
         return rootView;
@@ -164,7 +163,6 @@ public class PlayerFragment extends DialogFragment {
 
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         return dialog;
     }
 
@@ -172,25 +170,22 @@ public class PlayerFragment extends DialogFragment {
     @Override
     public void onStart() {
         Log.d(TAG, "onStart ");
-        super.onStart();
 
-        //if (!mPlayerBound) {
-            playIntent = new Intent(getActivity(), PlayerService.class);
-            playIntent.setAction(Constants.ACTION_CONNECT);
-            getActivity().bindService(playIntent, playerConnection, Context.BIND_AUTO_CREATE);
-        //}
+        super.onStart();
     }
 
 
     @Override
     public void onResume() {
         Log.d(TAG, "onResume ");
+
         super.onResume();
 
         if (mPlayerBound) {
             updateTrackDisplay();
         }
 
+        // Media buttons Listeners
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,7 +232,7 @@ public class PlayerFragment extends DialogFragment {
         });
 
         // Broadcast Receiver of Player Service Messages
-        broadcastIntentFilter = new IntentFilter();
+        IntentFilter broadcastIntentFilter = new IntentFilter();
         broadcastIntentFilter.addAction(Constants.PS_LAST_TRACK_COMPLETED);
         broadcastIntentFilter.addAction(Constants.PS_NEW_TRACK_STARTED);
         broadcastIntentFilter.addAction(Constants.PS_TRACK_PAUSE);
@@ -255,6 +250,23 @@ public class PlayerFragment extends DialogFragment {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause ");
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
+    }
+
+
+    @Override
+    public void onStop() {
+        //getActivity().unbindService(playerConnection);
+        //mPlayerService = null;
+        //mPlayerBound = false;
+
+        super.onStop();
+    }
+
     //
     // How to properly retain a DialogFragment through rotation?
     // http://stackoverflow.com/questions/14657490/how-to-properly-retain-a-dialogfragment-through-rotation
@@ -266,31 +278,14 @@ public class PlayerFragment extends DialogFragment {
         super.onDestroyView();
     }
 
-    @Override
-    public void onPause() {
-        Log.d(TAG, "onPause ");
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
-    }
-
-
-    @Override
-    public void onStop() {
-        getActivity().unbindService(playerConnection);
-        mPlayerService = null;
-        mPlayerBound = false;
-
-        super.onStop();
-    }
-
 
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy ");
 
-        //getActivity().unbindService(playerConnection);
-        //mPlayerService = null;
-        //mPlayerBound = false;
+        getActivity().unbindService(playerConnection);
+        mPlayerService = null;
+        mPlayerBound = false;
 
         super.onDestroyView();
     }
@@ -414,7 +409,7 @@ public class PlayerFragment extends DialogFragment {
                 Toast.makeText(context, "Current Track paused", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }
-            else if (Objects.equals(info, Constants.PS_TRACK_RESUME)) {
+            else if (info.equals(Constants.PS_TRACK_RESUME)) {
                 Toast.makeText(context, "Current Track resumed", Toast.LENGTH_SHORT).show();
                 updateTrackDisplay();
             }

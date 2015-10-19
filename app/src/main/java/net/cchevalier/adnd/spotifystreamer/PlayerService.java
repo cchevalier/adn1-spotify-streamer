@@ -1,6 +1,7 @@
 package net.cchevalier.adnd.spotifystreamer;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -32,8 +33,8 @@ import java.util.ArrayList;
  * PlayerService
  *
  *
- *      Display Notification via updateNotification()
- *      Broadcast status info via sendBroadcastInfo()
+ *      - Display Notification via updateNotification()
+ *      - Broadcast status info via sendBroadcastInfo()
  *
  * Created by cch on 19/08/2015.
  */
@@ -42,9 +43,10 @@ public class PlayerService extends Service implements
         MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
-    private final String TAG = "PLAYER_SERVICE";
+    private final String TAG = "SERVICE";
 
-    private static final int NOTIFICATION_ID = 1;
+    private NotificationManager mNM;
+    private static final int NOTIFICATION_ID = 1789;
 
     // Tracks settings
     private MyArtist mArtist;
@@ -58,6 +60,7 @@ public class PlayerService extends Service implements
 
     // Binder
     private final IBinder mPlayerBind = new PlayerBinder();
+    private boolean isBound = false;
 
     public class PlayerBinder extends Binder {
         public PlayerService getService() {
@@ -74,72 +77,101 @@ public class PlayerService extends Service implements
         service by calling bindService(). In your implementation of this method,
         you must provide an interface that clients use to communicate with the service,
         by returning an IBinder.
-
         You must always implement this method, but if you don't want to allow binding,
         then you should return null.
     */
         Log.d(TAG, "onBind ");
-        return mPlayerBind;
-    }
 
-    @Override
-    public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind ");
-        super.onRebind(intent);
+        isBound = true;
+        return mPlayerBind;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind ");
+
+        isBound = false;
         return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.d(TAG, "onRebind ");
+
+        isBound = true;
+        super.onRebind(intent);
     }
 
 
     @Override
     public void onCreate() {
+        /*
+        The system calls this method when the service is first created, to perform
+        one-time setup procedures (before it calls either onStartCommand() or onBind()).
+        If the service is already running, this method is not called.
+        */
         Log.d(TAG, "onCreate ");
         super.onCreate();
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        /*
+        The system calls this method when another component, such as an activity,
+        requests that the service be started, by calling startService().
+        Once this method executes, the service is started and can run in the
+        background indefinitely.
+        If you implement this, it is your responsibility to stop the service
+        when its work is done, by calling stopSelf() or stopService().
+        (If you only want to provide binding, you don't need to implement this method.)
+        */
 
-        if (intent.getAction().equals(Constants.ACTION_START)) {
-            Log.d(TAG, "onStartCommand: ACTION_START");
+        if (intent != null) {
 
-            if (mMediaPlayer == null) {
-                mMediaPlayer = new MediaPlayer();
-                initMediaPlayer();
+            if (intent.getAction().equals(Constants.ACTION_START)) {
+                Log.d(TAG, "onStartCommand: ACTION_START");
+
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = new MediaPlayer();
+                    initMediaPlayer();
+                }
+
+                mArtist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
+                mTracks = intent.getParcelableArrayListExtra(Constants.EXTRA_TRACKS);
+                mTrackNumber = intent.getIntExtra(Constants.EXTRA_TRACK_NB, 0);
+
+                playTrack();
             }
 
-            mArtist = intent.getParcelableExtra(Constants.EXTRA_ARTIST);
-            mTracks = intent.getParcelableArrayListExtra(Constants.EXTRA_TRACKS);
-            mTrackNumber = intent.getIntExtra(Constants.EXTRA_TRACK_NB, 0);
-
-            playTrack();
-        }
-
-        if (intent.getAction().equals(Constants.ACTION_PLAY_PREVIOUS)) {
-            Log.d(TAG, "onStartCommand: ACTION_PLAY_PREVIOUS");
-            playPrevious();
-        }
-
-        if (intent.getAction().equals(Constants.ACTION_PLAY_NEXT)) {
-            Log.d(TAG, "onStartCommand: ACTION_PLAY_NEXT");
-            playNext();
-        }
-
-        if (intent.getAction().equals(Constants.ACTION_PLAY_PAUSE)) {
-            Log.d(TAG, "onStartCommand: ACTION_PLAY_PAUSE");
-            if (isPlaying()) {
-                pause();
-            } else {
-                resumePlay();
+            if (intent.getAction().equals(Constants.ACTION_PLAY_PREVIOUS)) {
+                Log.d(TAG, "onStartCommand: ACTION_PLAY_PREVIOUS");
+                playPrevious();
             }
+
+            if (intent.getAction().equals(Constants.ACTION_PLAY_NEXT)) {
+                Log.d(TAG, "onStartCommand: ACTION_PLAY_NEXT");
+                playNext();
+            }
+
+            if (intent.getAction().equals(Constants.ACTION_PLAY_PAUSE)) {
+                Log.d(TAG, "onStartCommand: ACTION_PLAY_PAUSE");
+                if (isPlaying()) {
+                    pause();
+                } else {
+                    resumePlay();
+                }
+            }
+
+            if (intent.getAction().equals(Constants.ACTION_DISMISS)) {
+                Log.d(TAG, "onStartCommand: ACTION_DISMISS");
+                Toast.makeText(getApplicationContext(), "DISMISS",Toast.LENGTH_SHORT).show();
+            }
+
         }
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
 
@@ -183,20 +215,33 @@ public class PlayerService extends Service implements
 
 
     private void updateNotification() {
+
         // Create a notification area that get user back to the PlayerActivity (UI)
 
-        // Display Player Intent to navigate back to Player UI from notification
-        final Intent displayPlayerIntent = new Intent(getApplicationContext(), PlayerActivity.class);
-        displayPlayerIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
-        final PendingIntent displayPlayerPendingIntent = PendingIntent.getActivity(this, 0, displayPlayerIntent, 0);
+        // Content Intent: navigate back to Player UI from notification
+        final Intent displayIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+        displayIntent.setAction(Constants.ACTION_DISPLAY_PLAYER);
+        final PendingIntent displayPendingIntent = PendingIntent.getActivity(this, 0, displayIntent, 0);
+
+        // Delete intent:
+        final Intent deleteIntent = new Intent(getApplicationContext(), this.getClass());
+        deleteIntent.setAction(Constants.ACTION_DISMISS);
+        final PendingIntent deletePendingIntent = PendingIntent.getService(getApplicationContext(), 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //final PendingIntent previousPendingIntent = PendingIntent.getService(getApplicationContext(), 0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build base notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_media_play)
-                .setOngoing(true)
                 .setContentTitle(mCurrentTrack.name)
                 .setContentText(mArtist.name + " / " + mCurrentTrack.album)
-                .setContentIntent(displayPlayerPendingIntent);
+                .setContentIntent(displayPendingIntent)
+                .setDeleteIntent(deletePendingIntent);
+
+        /*
+        mBuilder.setOngoing(true)
+                .setDeleteIntent(displayPlayerPendingIntent);
+        */
+
 
         final Notification notification = mBuilder.build();
 
@@ -228,7 +273,6 @@ public class PlayerService extends Service implements
             RemoteViews bigRemoteViews = new RemoteViews(getPackageName(), R.layout.notification_player_big);
 
             bigRemoteViews.setImageViewResource(R.id.notification_album_art, android.R.drawable.ic_menu_help);
-
             Picasso.with(this)
                     .load(mCurrentTrack.UrlMediumImage)
                     .into(bigRemoteViews, R.id.notification_album_art, NOTIFICATION_ID, notification);
@@ -280,6 +324,8 @@ public class PlayerService extends Service implements
         // Put this Service in a foreground state, so it won't
         // readily be killed by the system
         startForeground(NOTIFICATION_ID, notification);
+
+        //mNM.notify(NOTIFICATION_ID, notification);
     }
 
     @Override
@@ -311,12 +357,11 @@ public class PlayerService extends Service implements
     private void sendBroadcastInfo(String info) {
         Log.d(TAG, "sendBroadcastInfo " + info);
 
-        Intent broadcastInfoIntent = new Intent();
-        broadcastInfoIntent.setAction(info);
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastInfoIntent);
-
+        Intent infoIntent = new Intent();
+        infoIntent.setAction(info);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(infoIntent);
     }
+
 
     public void playTrack() {
         Log.d(TAG, "playTrack ");
@@ -334,21 +379,24 @@ public class PlayerService extends Service implements
         mMediaPlayer.prepareAsync();
     }
 
-    public void playNext(){
-        if (!isLastTrack()){
+    public void playNext() {
+        Log.d(TAG, "playNext ");
+        if (!isLastTrack()) {
             mTrackNumber++;
             playTrack();
         }
     }
 
-    public void playPrevious(){
-        if (!isFirstTrack()){
+    public void playPrevious() {
+        Log.d(TAG, "playPrevious ");
+        if (!isFirstTrack()) {
             mTrackNumber--;
             playTrack();
         }
     }
 
     public void pause() {
+        Log.d(TAG, "pause ");
         mMediaPlayer.pause();
         sendBroadcastInfo(Constants.PS_TRACK_PAUSE);
         updateNotification();
@@ -356,6 +404,7 @@ public class PlayerService extends Service implements
 
 
     public void resumePlay() {
+        Log.d(TAG, "resumePlay ");
         mMediaPlayer.start();
         sendBroadcastInfo(Constants.PS_TRACK_RESUME);
         updateNotification();
@@ -378,7 +427,8 @@ public class PlayerService extends Service implements
     public boolean isPlaying() {
         if (mMediaPlayer != null) {
             return mMediaPlayer.isPlaying();
-        } else return false;
+        }
+        return false;
     }
 
     public boolean isFirstTrack() {

@@ -18,6 +18,7 @@ public class Constants {
     // Intents ACTION "net.cchevalier.adnd.spotifystreamer"
     public final static String ACTION_CONNECT = "net.cchevalier.adnd.spotifystreamer.ACTION_CONNECT";
     public final static String ACTION_START = "net.cchevalier.adnd.spotifystreamer.ACTION_START";
+    public final static String ACTION_DISMISS = "net.cchevalier.adnd.spotifystreamer.ACTION_DISMISS";
     public final static String ACTION_DISPLAY_PLAYER = "net.cchevalier.adnd.spotifystreamer.ACTION_DISPLAY_PLAYER";
     public final static String ACTION_PLAY_PREVIOUS = "net.cchevalier.adnd.spotifystreamer.ACTION_PLAY_PREVIOUS";
     public final static String ACTION_PLAY_NEXT = "net.cchevalier.adnd.spotifystreamer.ACTION_PLAY_NEXT";
