@@ -8,6 +8,7 @@ by CChevalier, October 2015.
 
 
 ## Submission 2
+Second submission of Spotify Streamer - Stage 2 after a break. This time I give also a try at the optional components / exceeds specifications.
 
 ### Optional Components
 
