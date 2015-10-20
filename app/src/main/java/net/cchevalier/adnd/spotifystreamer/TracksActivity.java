@@ -39,12 +39,16 @@ public class TracksActivity extends AppCompatActivity {
             arguments.putBoolean(Constants.EXTRA_IS_TABLET, mUiTablet);
             arguments.putParcelable(Constants.EXTRA_ARTIST, artist);
 
-            TracksFragment tracksFragment = new TracksFragment();
-            tracksFragment.setArguments(arguments);
+            // Fix bug submission 2 (savedInstance check + replace instead of add)
+            if (savedInstanceState == null) {
+                TracksFragment tracksFragment = new TracksFragment();
+                tracksFragment.setArguments(arguments);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_fragment_tracks, tracksFragment)
-                    .commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container_fragment_tracks, tracksFragment)
+                        .commit();
+
+            }
         }
 
         ActionBar actionBar = getSupportActionBar();
