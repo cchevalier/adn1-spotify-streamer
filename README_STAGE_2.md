@@ -7,6 +7,11 @@ by CChevalier, October 2015.
 ---
 
 
+## Submission 3
+Fix the overlap issue encountered on Top Tracks Activity after rotation.
+   
+---
+   
 ## Submission 2
 Second submission of Spotify Streamer - Stage 2 after a break. This time I give also a try at the optional components / exceeds specifications.
 
